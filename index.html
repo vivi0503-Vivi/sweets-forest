@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>夢幻甜點森林 | 生甜甜圈團購系統</title>
+    <style>
+        :root {
+            --ghibli-cream: #FDF5E6;
+            --ghibli-green: #6B8E23;
+            --ghibli-brown: #5D4037;
+            --ghibli-pink: #FFB6C1;
+            --error-red: #D32F2F;
+        }
+
+        /* 基礎樣式重置 */
+        body {
+            font-family: -apple-system, "Noto Sans TC", sans-serif;
+            background-color: var(--ghibli-cream);
+            color: var(--ghibli-brown);
+            margin: 0; padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-container {
+            max-width: 500px; margin: 0 auto;
+            min-height: 100vh; display: flex; flex-direction: column;
+            padding: 20px; box-sizing: border-box;
+            padding-bottom: 100px;
+        }
+
+        h1 { text-align: center; color: var(--ghibli-green); font-size: 1.4rem; margin-bottom: 25px; }
+
+        /* 頁面流暢切換動畫 */
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 卡片設計 */
+        .card {
+            background: white; padding: 20px;
+            border-radius: 20px; border: 2px solid var(--ghibli-brown);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95rem; }
+        input {
+            width: 100%; height: 50px; font-size: 1rem;
+            padding: 0 15px; border: 1.5px solid #DDD;
+            border-radius: 12px; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--ghibli-green); outline: none; box-shadow: 0 0 5px rgba(107,142,35,0.2); }
+
+        /* 品項選擇器 */
+        .flavor-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid #F0F0F0;
+        }
+        .qty-control { display: flex; align-items: center; gap: 10px; }
+        .qty-btn {
+            width: 42px; height: 42px; border-radius: 50%;
+            border: 1.5px solid var(--ghibli-green);
+            background: white; color: var(--ghibli-green); font-size: 1.4rem;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+        }
+        .qty-val { width: 30px; text-align: center; font-weight: bold; font-size: 1.1rem; }
+
+        /* 導航按鈕 */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; padding: 15px 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            display: flex; gap: 10px; max-width: 500px; margin: 0 auto;
+            z-index: 99;
+        }
+        .btn { flex: 1; height: 55px; border-radius: 30px; border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--ghibli-green); color: white; }
+        .btn-secondary { background: #EEE; color: var(--ghibli-brown); flex: 0.4; }
+        .btn:active { transform: scale(0.98); }
+
+        /* 彈窗體系 */
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-body {
+            background: var(--ghibli-cream); padding: 25px; border-radius: 25px;
+            width: 100%; border: 3px solid var(--ghibli-brown); text-align: center;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>🥐 夢幻甜點世界團購</h1>
+
+    <div id="page1" class="page active">
+        <div class="card">
+            <div class="form-group">
+                <label>收件人姓名 (15字內)</label>
+                <input type="text" id="name" maxlength="15" placeholder="請填寫中文或英文姓名">
+            </div>
+            <div class="form-group">
+                <label>收件電話 (10碼內數字)</label>
+                <input type="tel" id="phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+            <div class="form-group">
+                <label>宅配郵遞區號 (5碼數字)</label>
+                <input type="tel" id="zipcode" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+            <div class="form-group">
+                <label>宅配詳細地址 (40字內)</label>
+                <input type="text" id="address" maxlength="40">
+            </div>
+        </div>
+        <div class="bottom-nav">
+            <button class="btn btn-primary" onclick="goPage(2)">下一步：挑選風味 →</button>
+        </div>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="card" id="item-list"></div>
+        <div class="bottom-nav">
+            <button class="btn btn-secondary" onclick="goPage(1)">返回</button>
+            <button class="btn btn-primary" onclick="renderSummary()">查看明細 →</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <div class="card">
+            <h3>📖 訂購明細匯總</h3>
+            <div id="summary-content" style="line-height: 1.8;"></div>
+            <hr style="border: 0.5px dashed var(--ghibli-brown); margin: 15px 0;">
+            <h3 id="final-total" style="text-align: right; color: var(--error-red);"></h3>
+        </div>
+        <div class="bottom-nav">
+            <button class="btn btn-secondary" onclick="goPage(2)">修改數量</button>
+            <button class="btn btn-primary" onclick="openModal()">確認匯款資訊</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-body">
+        <h3>💰 匯款帳戶資訊</h3>
+        <div style="background: white; padding: 15px; border-radius: 15px; border: 2px dashed var(--ghibli-brown); text-align: left; margin-bottom: 15px; position: relative;">
+            <strong>銀行代碼：</strong> 822 (中國信託)<br>
+            <strong>匯款帳號：</strong> <span id="acc-num" style="letter-spacing: 1px;">123456789012</span><br>
+            <strong>戶名：</strong> 夢幻甜點工作室<br>
+            <button onclick="copyAccount()" style="margin-top: 10px; width: 100%; border-radius: 10px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; cursor: pointer;">📋 一鍵複製帳號</button>
+            <span id="copy-tip" style="display:none; color: var(--ghibli-green); font-size: 0.8rem; position: absolute; top: 10px; right: 10px; font-weight: bold;">已複製!</span>
+        </div>
+        <p style="font-size: 0.9rem;">請匯入總額：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.2rem;"></strong> 元</p>
+        <div class="form-group" style="text-align: left;">
+            <label>請輸入您的匯款後五碼：</label>
+            <input type="tel" id="lastFive" maxlength="5" placeholder="僅需填寫 5 位數字" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+        <button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認並送出訂單</button>
+        <p onclick="closeModal()" style="color:gray; margin-top:15px; cursor:pointer; font-size: 0.9rem;">返回訂單明細</p>
+    </div>
+</div>
+
+<div id="success-modal" class="modal">
+    <div class="modal-body" style="background: white; border: 4px solid var(--ghibli-green);">
+        <h2 style="color: var(--ghibli-green);">🎉 訂單已成功受理！</h2>
+        <p>感謝您的訂購，美味值得等待。</p>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem; line-height: 1.6;">
+            <strong>後續處理流程：</strong><br>
+            1. 系統將於 24H 內自動對帳。<br>
+            2. 對帳完成將發送確認簡訊。<br>
+            3. 排單製作後於指定日期宅配。
+        </div>
+        <p style="color: gray; font-size: 0.8rem; margin-top: 15px;">
+            為保護個資，此視窗將於 <span id="countdown" style="color:var(--error-red); font-weight:bold;">120</span> 秒後自動重置。
+        </p>
+        <button class="btn btn-primary" style="width: 100%;" onclick="location.reload()">回首頁</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. 安全防護：HTTPS 強制轉導 ---
+    if (location.protocol === 'http:' && location.hostname !== 'localhost') {
+        location.replace(`https://${location.host}${location.pathname}${location.search}`);
+    }
+
+    // --- 2. 閒置逾時：10 分鐘無操作自動中斷 ---
+    const IDLE_LIMIT = 10 * 60 * 1000;
+    let idleTimer;
+    function resetIdleTimer() {
+        if (document.getElementById('timeout-overlay') || document.getElementById('success-modal').style.display === 'flex') return;
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(triggerTimeout, IDLE_LIMIT);
+    }
+    function triggerTimeout() {
+        const overlay = document.createElement('div');
+        overlay.id = 'timeout-overlay';
+        overlay.style.cssText = `position:fixed; inset:0; background:rgba(253,245,230,0.98); z-index:10000; display:flex; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(8px);`;
+        overlay.innerHTML = `<div style="text-align:center; padding:20px; border:2px solid var(--ghibli-brown); border-radius:20px; background:white;"><h2>🍩 填寫逾時囉！</h2><p>為了資料安全，請重新整理頁面再下單。</p><button onclick="location.reload()" class="btn btn-primary" style="padding:10px 40px;">立即重置</button></div>`;
+        document.body.appendChild(overlay);
+    }
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(e => window.addEventListener(e, resetIdleTimer, true));
+    resetIdleTimer();
+
+    // --- 3. 團購邏輯：品項與渲染 ---
+    const flavors = [
+        {id:'qty_original', name:'原味(無內餡)', price:50},
+        {id:'qty_custard', name:'卡士達醬', price:70},
+        {id:'qty_matcha', name:'抹茶風味', price:60},
+        {id:'qty_chocolate', name:'苦甜巧克力', price:60},
+        {id:'qty_peanut', name:'香濃花生', price:60}
+    ];
+    let cart = { qty_original:0, qty_custard:0, qty_matcha:0, qty_chocolate:0, qty_peanut:0 };
+    const listEl = document.getElementById('item-list');
+    flavors.forEach(f => {
+        listEl.innerHTML += `
+            <div class="flavor-item">
+                <div class="flavor-info"><strong>${f.name}</strong><br><small style="color:gray;">NT$ ${f.price} / 顆</small></div>
+                <div class="qty-control">
+                    <button class="qty-btn" onclick="updateQty('${f.id}', -1)">-</button>
+                    <span class="qty-val" id="q-${f.id}">0</span>
+                    <button class="qty-btn" onclick="updateQty('${f.id}', 1)">+</button>
+                </div>
+            </div>`;
+    });
+
+    function updateQty(id, delta) {
+        cart[id] = Math.max(0, cart[id] + delta);
+        document.getElementById(`q-${id}`).innerText = cart[id];
+        resetIdleTimer();
+    }
+
+    function goPage(n) {
+        if (n === 2 && !validateP1()) return;
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page'+n).classList.add('active');
+        window.scrollTo(0,0);
+        resetIdleTimer();
+    }
+
+    function validateP1() {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const zip = document.getElementById('zipcode').value;
+        const addr = document.getElementById('address').value;
+        if (name.trim().length === 0 || name.length > 15) return err("請填寫姓名（15字內）");
+        if (!/^\d{1,10}$/.test(phone)) return err("請填寫有效的電話數字（10碼內）");
+        if (!/^\d{5}$/.test(zip)) return err("郵遞區號需為 5 位數字");
+        if (addr.trim().length === 0 || addr.length > 40) return err("地址需填寫（40字內）");
+        return true;
+    }
+    function err(m) { alert(m); return false; }
+
+    function renderSummary() {
+        let total = 0, html = '';
+        flavors.forEach(f => {
+            if(cart[f.id] > 0) {
+                let subTotal = cart[f.id] * f.price;
+                html += `<p style="display:flex; justify-content:space-between;"><span>${f.name} x ${cart[f.id]}</span> <span>$${subTotal}</span></p>`;
+                total += subTotal;
+            }
+        });
+        if(total === 0) return alert("請至少選擇一個品項喔！");
+        document.getElementById('summary-content').innerHTML = html;
+        document.getElementById('final-total').innerText = `應匯總計：NT$ ${total}`;
+        document.getElementById('modal-amt').innerText = total;
+        goPage(3);
+    }
+
+    function openModal() { document.getElementById('modal').style.display='flex'; }
+    function closeModal() { document.getElementById('modal').style.display='none'; }
+
+    function copyAccount() {
+        const acc = document.getElementById('acc-num').innerText;
+        navigator.clipboard.writeText(acc).then(() => {
+            const tip = document.getElementById('copy-tip');
+            tip.style.display='inline';
+            setTimeout(() => tip.style.display='none', 2000);
+        });
+    }
+
+    // --- 4. 最終交互：送出資料與成功計時 ---
+    function finalSubmit() {
+        const lastFive = document.getElementById('lastFive').value;
+        if(!/^\d{5}$/.test(lastFive)) return alert("請輸入正確的 5 位匯款後五碼");
+        
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "傳送中...";
+        btn.disabled = true;
+
+        const orderData = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            zipcode: document.getElementById('zipcode').value,
+            address: document.getElementById('address').value,
+            ...cart,
+            total_price: document.getElementById('modal-amt').innerText,
+            last_five: lastFive
+        };
+
+        // 重要：在此貼上您的 Google Apps Script 部署 URL
+        fetch('https://script.google.com/macros/s/AKfycbwRlChD4uISW8MAMXskcN8AqDd8l5ZuP1Hj8rjUQbVHF1ETWP6wmegseHMlksHwow7C/exec', {
+            method: 'POST',
+            body: JSON.stringify(orderData)
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.result === 'success') {
+                showSuccessAndTimer();
+            } else {
+                alert("⚠️ 錯誤：" + result.message);
+                btn.innerText = "重新送出訂單";
+                btn.disabled = false;
+            }
+        })
+        .catch(err => {
+            alert("網路連線發生異常，請確認連線後再試一次。");
+            btn.innerText = "確認送出訂單";
+            btn.disabled = false;
+        });
+    }
+
+    function showSuccessAndTimer() {
+        document.getElementById('modal').style.display = 'none';
+        const successModal = document.getElementById('success-modal');
+        successModal.style.display = 'flex';
+
+        let secondsLeft = 120; // 2 分鐘自動重置
+        const countdownEl = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            secondsLeft--;
+            countdownEl.innerText = secondsLeft;
+            if (secondsLeft <= 0) {
+                clearInterval(timer);
+                location.reload(); // 重置所有狀態回首頁
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>
