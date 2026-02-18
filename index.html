@@ -101,19 +101,19 @@
     <div id="page1" class="page active">
         <div class="card">
             <div class="form-group">
-                <label>收件人姓名 (15字內)</label>
+                <label>訂購姓名</label>
                 <input type="text" id="name" maxlength="15" placeholder="請填寫中文或英文姓名">
             </div>
             <div class="form-group">
-                <label>收件電話 (10碼內數字)</label>
+                <label>訂購人電話</label>
                 <input type="tel" id="phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
             </div>
             <div class="form-group">
-                <label>宅配郵遞區號 (5碼數字)</label>
+                <label>宅配郵遞區號 (3碼或是5碼數字)</label>
                 <input type="tel" id="zipcode" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
             </div>
             <div class="form-group">
-                <label>宅配詳細地址 (40字內)</label>
+                <label>宅配詳細地址 (須包含縣市與地區)</label>
                 <input type="text" id="address" maxlength="40">
             </div>
         </div>
@@ -132,7 +132,7 @@
 
     <div id="page3" class="page">
         <div class="card">
-            <h3>📖 訂購明細匯總</h3>
+            <h3>📖 訂購明細</h3>
             <div id="summary-content" style="line-height: 1.8;"></div>
             <hr style="border: 0.5px dashed var(--ghibli-brown); margin: 15px 0;">
             <h3 id="final-total" style="text-align: right; color: var(--error-red);"></h3>
@@ -171,8 +171,8 @@
         <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem; line-height: 1.6;">
             <strong>後續處理流程：</strong><br>
             1. 系統將於 24H 內自動對帳。<br>
-            2. 對帳完成將發送確認簡訊。<br>
-            3. 排單製作後於指定日期宅配。
+            2. 對帳完成店家將發送確認簡訊。<br>
+            3. 排單製作後將告知宅配日期。
         </div>
         <p style="color: gray; font-size: 0.8rem; margin-top: 15px;">
             為保護個資，此視窗將於 <span id="countdown" style="color:var(--error-red); font-weight:bold;">120</span> 秒後自動重置。
@@ -240,18 +240,24 @@
         window.scrollTo(0,0);
         resetIdleTimer();
     }
-
     function validateP1() {
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const zip = document.getElementById('zipcode').value;
-        const addr = document.getElementById('address').value;
-        if (name.trim().length === 0 || name.length > 15) return err("請填寫姓名（15字內）");
-        if (!/^\d{1,10}$/.test(phone)) return err("請填寫有效的電話數字（10碼內）");
-        if (!/^\d{5}$/.test(zip)) return err("郵遞區號需為 5 位數字");
-        if (addr.trim().length === 0 || addr.length > 40) return err("地址需填寫（40字內）");
-        return true;
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const zip = document.getElementById('zipcode').value;
+    const addr = document.getElementById('address').value;
+
+    if (name.trim().length === 0 || name.length > 15) return err("請填寫姓名（15字內）");
+    
+    // --- 修改這裡：檢查是否剛好為 10 碼 ---
+    if (phone.length !== 10) {
+        return err("電話格式錯誤：請填寫完整的 10 碼數字（例如：0912345678; 家電請加上區碼不需要空格或是括號0228957766）");
     }
+    
+    if (!/^\d{5}$/.test(zip)) return err("郵遞區號需為 5 位數字");
+    if (addr.trim().length === 0 || addr.length > 40) return err("地址需填寫（40字內）");
+    
+    return true;
+}
     function err(m) { alert(m); return false; }
 
     function renderSummary() {
@@ -283,14 +289,26 @@
     }
 
     // --- 4. 最終交互：送出資料與成功計時 ---
-    function finalSubmit() {
-        const lastFive = document.getElementById('lastFive').value;
-        if(!/^\d{5}$/.test(lastFive)) return alert("請輸入正確的 5 位匯款後五碼");
-        
-        const btn = document.getElementById('submit-btn');
-        btn.innerText = "傳送中...";
-        btn.disabled = true;
+function finalSubmit() {
+    const lastFive = document.getElementById('lastFive').value;
 
+    // --- 修改這裡：同時檢查是否為數字，且長度「必須等於」 5 ---
+    if (lastFive.length !== 5) {
+        alert("⚠️ 格式錯誤：匯款後五碼必須「剛好為 5 位」數字，請重新檢查。");
+        document.getElementById('lastFive').focus(); // 自動幫使用者點擊輸入框
+        return; // 攔截送出動作
+    }
+    
+    // 原有的傳送邏輯...
+    const btn = document.getElementById('submit-btn');
+    btn.innerText = "傳送中...";
+    btn.disabled = true;
+    /* 當輸入滿 5 碼時顯示綠色框線 (選擇性加入) */
+#lastFive:valid {
+    border-color: var(--ghibli-green);
+}
+
+}
         const orderData = {
             name: document.getElementById('name').value,
             phone: document.getElementById('phone').value,
@@ -341,4 +359,5 @@
     }
 </script>
 </body>
+
 </html>
