@@ -45,12 +45,21 @@
 
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95rem; }
+        
         input {
             width: 100%; height: 50px; font-size: 1rem;
             padding: 0 15px; border: 1.5px solid #DDD;
             border-radius: 12px; box-sizing: border-box;
+            transition: all 0.3s ease;
         }
         input:focus { border-color: var(--ghibli-green); outline: none; box-shadow: 0 0 5px rgba(107,142,35,0.2); }
+        
+        /* 綠框提示樣式 */
+        .valid-input {
+            border-color: var(--ghibli-green) !important;
+            background-color: #fafffa;
+            box-shadow: 0 0 5px rgba(107,142,35,0.1);
+        }
 
         /* 品項選擇器 */
         .flavor-item {
@@ -101,20 +110,20 @@
     <div id="page1" class="page active">
         <div class="card">
             <div class="form-group">
-                <label>訂購姓名</label>
-                <input type="text" id="name" maxlength="15" placeholder="請填寫中文或英文姓名">
+                <label>收件人姓名</label>
+                <input type="text" id="name" maxlength="15" placeholder="請填寫中文或英文姓名" oninput="checkValid(this, 1)">
             </div>
             <div class="form-group">
-                <label>訂購人電話</label>
-                <input type="tel" id="phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <label>收件電話 (需滿10碼數字)</label>
+                <input type="tel" id="phone" maxlength="10" placeholder="需滿10碼數字" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)">
             </div>
             <div class="form-group">
                 <label>宅配郵遞區號 (3碼或是5碼數字)</label>
-                <input type="tel" id="zipcode" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <input type="tel" id="zipcode" maxlength="5" placeholder="需滿5碼數字" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 5)">
             </div>
             <div class="form-group">
-                <label>宅配詳細地址 (須包含縣市與地區)</label>
-                <input type="text" id="address" maxlength="40">
+                <label>宅配詳細地址 (需包含縣市與地區)</label>
+                <input type="text" id="address" maxlength="40" placeholder="例：新北市三重區..." oninput="checkValid(this, 5)">
             </div>
         </div>
         <div class="bottom-nav">
@@ -132,7 +141,7 @@
 
     <div id="page3" class="page">
         <div class="card">
-            <h3>📖 訂購明細</h3>
+            <h3>📖 訂購明細總表</h3>
             <div id="summary-content" style="line-height: 1.8;"></div>
             <hr style="border: 0.5px dashed var(--ghibli-brown); margin: 15px 0;">
             <h3 id="final-total" style="text-align: right; color: var(--error-red);"></h3>
@@ -157,7 +166,7 @@
         <p style="font-size: 0.9rem;">請匯入總額：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.2rem;"></strong> 元</p>
         <div class="form-group" style="text-align: left;">
             <label>請輸入您的匯款後五碼：</label>
-            <input type="tel" id="lastFive" maxlength="5" placeholder="僅需填寫 5 位數字" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <input type="tel" id="lastFive" maxlength="5" placeholder="需滿5位數字" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 5)">
         </div>
         <button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認並送出訂單</button>
         <p onclick="closeModal()" style="color:gray; margin-top:15px; cursor:pointer; font-size: 0.9rem;">返回訂單明細</p>
@@ -167,7 +176,7 @@
 <div id="success-modal" class="modal">
     <div class="modal-body" style="background: white; border: 4px solid var(--ghibli-green);">
         <h2 style="color: var(--ghibli-green);">🎉 訂單已成功受理！</h2>
-        <p>感謝您的訂購，美味值得等待。</p>
+        <p>感謝您的預約，美味值得等待。</p>
         <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem; line-height: 1.6;">
             <strong>後續處理流程：</strong><br>
             1. 系統將於 24H 內自動對帳。<br>
@@ -175,19 +184,37 @@
             3. 排單製作後將告知宅配日期。
         </div>
         <p style="color: gray; font-size: 0.8rem; margin-top: 15px;">
-            為保護個資，此視窗將於 <span id="countdown" style="color:var(--error-red); font-weight:bold;">120</span> 秒後自動重置。
+            此視窗將於 <span id="countdown" style="color:var(--error-red); font-weight:bold;">120</span> 秒後自動重置。
         </p>
         <button class="btn btn-primary" style="width: 100%;" onclick="location.reload()">回首頁</button>
     </div>
 </div>
 
 <script>
-    // --- 1. 安全防護：HTTPS 強制轉導 ---
+    // --- 1. 綠框檢查邏輯 (含地址關鍵字判斷) ---
+    function checkValid(el, min) {
+        let isValid = false;
+        
+        if (el.id === 'address') {
+            // 地址條件：長度>=5 且 包含(縣或市) 且 包含(區或鄉或鎮或市)
+            isValid = el.value.length >= 5 && /縣|市/.test(el.value) && /區|鄉|鎮|市/.test(el.value);
+        } else {
+            // 一般條件：長度達標
+            isValid = el.value.trim().length >= min;
+        }
+
+        if (isValid) {
+            el.classList.add('valid-input');
+        } else {
+            el.classList.remove('valid-input');
+        }
+    }
+
+    // --- 2. 安全與逾時設定 ---
     if (location.protocol === 'http:' && location.hostname !== 'localhost') {
         location.replace(`https://${location.host}${location.pathname}${location.search}`);
     }
 
-    // --- 2. 閒置逾時：10 分鐘無操作自動中斷 ---
     const IDLE_LIMIT = 10 * 60 * 1000;
     let idleTimer;
     function resetIdleTimer() {
@@ -205,7 +232,7 @@
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(e => window.addEventListener(e, resetIdleTimer, true));
     resetIdleTimer();
 
-    // --- 3. 團購邏輯：品項與渲染 ---
+    // --- 3. 團購品項設定 ---
     const flavors = [
         {id:'qty_original', name:'原味(無內餡)', price:50},
         {id:'qty_custard', name:'卡士達醬', price:70},
@@ -240,24 +267,26 @@
         window.scrollTo(0,0);
         resetIdleTimer();
     }
-    function validateP1() {
-    const name = document.getElementById('name').value;
-    const phone = document.getElementById('phone').value;
-    const zip = document.getElementById('zipcode').value;
-    const addr = document.getElementById('address').value;
 
-    if (name.trim().length === 0 || name.length > 15) return err("請填寫姓名（15字內）");
-    
-    // --- 修改這裡：檢查是否剛好為 10 碼 ---
-    if (phone.length !== 10) {
-        return err("電話格式錯誤：請填寫完整的 10 碼數字（例如：0912345678; 家電請加上區碼不需要空格或是括號0228957766）");
+    function validateP1() {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const zip = document.getElementById('zipcode').value;
+        const addr = document.getElementById('address').value;
+
+        if (name.trim().length === 0 || name.length > 15) return err("請填寫姓名（15字內）");
+        if (phone.length !== 10) return err("電話需完整10碼（例如：0912345678;家電請加上區碼0228957766）");
+        if (zip.trim().length === 0 || zip.length > 5) return err("郵遞區號需為 5 位數字");
+
+        // 地址精密檢查
+        const hasCity = /縣|市/.test(addr);
+        const hasDistrict = /區|鄉|鎮|市/.test(addr);
+        if (!hasCity || !hasDistrict || addr.trim().length < 5) {
+            return err("地址格式不完整：需包含「縣/市」及「區/鄉/鎮/市」");
+        }
+        
+        return true;
     }
-    
-    if (!/^\d{5}$/.test(zip)) return err("郵遞區號需為 5 位數字");
-    if (addr.trim().length === 0 || addr.length > 40) return err("地址需填寫（40字內）");
-    
-    return true;
-}
     function err(m) { alert(m); return false; }
 
     function renderSummary() {
@@ -288,27 +317,19 @@
         });
     }
 
-    // --- 4. 最終交互：送出資料與成功計時 ---
-function finalSubmit() {
-    const lastFive = document.getElementById('lastFive').value;
+    // --- 4. 最終送出與成功計時 ---
+    function finalSubmit() {
+        const lastFive = document.getElementById('lastFive').value;
+        if (lastFive.length !== 5) {
+            alert("⚠️ 格式錯誤：匯款後五碼必須為 5 位數字。");
+            document.getElementById('lastFive').focus();
+            return;
+        }
 
-    // --- 修改這裡：同時檢查是否為數字，且長度「必須等於」 5 ---
-    if (lastFive.length !== 5) {
-        alert("⚠️ 格式錯誤：匯款後五碼必須「剛好為 5 位」數字，請重新檢查。");
-        document.getElementById('lastFive').focus(); // 自動幫使用者點擊輸入框
-        return; // 攔截送出動作
-    }
-    
-    // 原有的傳送邏輯...
-    const btn = document.getElementById('submit-btn');
-    btn.innerText = "傳送中...";
-    btn.disabled = true;
-    /* 當輸入滿 5 碼時顯示綠色框線 (選擇性加入) */
-#lastFive:valid {
-    border-color: var(--ghibli-green);
-}
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "傳送中...";
+        btn.disabled = true;
 
-}
         const orderData = {
             name: document.getElementById('name').value,
             phone: document.getElementById('phone').value,
@@ -319,7 +340,6 @@ function finalSubmit() {
             last_five: lastFive
         };
 
-        // 重要：在此貼上您的 Google Apps Script 部署 URL
         fetch('https://script.google.com/macros/s/AKfycbwRlChD4uISW8MAMXskcN8AqDd8l5ZuP1Hj8rjUQbVHF1ETWP6wmegseHMlksHwow7C/exec', {
             method: 'POST',
             body: JSON.stringify(orderData)
@@ -330,13 +350,13 @@ function finalSubmit() {
                 showSuccessAndTimer();
             } else {
                 alert("⚠️ 錯誤：" + result.message);
-                btn.innerText = "重新送出訂單";
+                btn.innerText = "確認並送出訂單";
                 btn.disabled = false;
             }
         })
         .catch(err => {
-            alert("網路連線發生異常，請確認連線後再試一次。");
-            btn.innerText = "確認送出訂單";
+            alert("網路連線發生異常，請確認連線後再試。");
+            btn.innerText = "確認並送出訂單";
             btn.disabled = false;
         });
     }
@@ -345,19 +365,17 @@ function finalSubmit() {
         document.getElementById('modal').style.display = 'none';
         const successModal = document.getElementById('success-modal');
         successModal.style.display = 'flex';
-
-        let secondsLeft = 120; // 2 分鐘自動重置
+        let secondsLeft = 120;
         const countdownEl = document.getElementById('countdown');
         const timer = setInterval(() => {
             secondsLeft--;
             countdownEl.innerText = secondsLeft;
             if (secondsLeft <= 0) {
                 clearInterval(timer);
-                location.reload(); // 重置所有狀態回首頁
+                location.reload();
             }
         }, 1000);
     }
 </script>
 </body>
-
 </html>
