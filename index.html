@@ -153,15 +153,15 @@
     <div class="modal-body">
         <h3>💰 匯款帳戶資訊</h3>
         <div style="background: white; padding: 15px; border-radius: 15px; border: 2px dashed var(--ghibli-brown); text-align: left; margin-bottom: 15px;">
-            <strong>銀行：</strong> 700 (郵局)<br>
+            <strong>銀行代碼：</strong> 700 (郵局)<br>
             <strong>帳號：</strong> <span id="acc-num">24414400800351</span><br>
-            <strong>戶名：</strong> 莊詠茗
-            <button onclick="copyAccount()" style="margin-top: 10px; width: 100%; border-radius: 10px; padding: 8px;">複製帳號</button>
+            <strong>戶名：</strong> 莊詠茗<br>
+            <button onclick="copyAccount()" style="margin-top: 10px; width: 100%; border-radius: 10px; padding: 8px;">📋 複製帳號</button>
         </div>
         <p>應匯金額：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.3rem;"></strong> 元</p>
         <input type="tel" id="lastFive" maxlength="5" placeholder="請輸入匯款後五碼" style="margin-bottom: 15px;">
         <button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認並送出訂單</button>
-        <p onclick="closeModal()" style="color:gray; margin-top:10px; cursor:pointer;">返回</p>
+        <p onclick="closeModal()" style="color:gray; margin-top:10px; cursor:pointer;">返回修改</p>
     </div>
 </div>
 
@@ -174,7 +174,6 @@
 </div>
 
 <script>
-    // --- 數據 ---
     const flavors = [
         {id:'qty_original', name:'原味(無內餡)', price:50},
         {id:'qty_custard', name:'卡士達', price:70},
@@ -184,7 +183,7 @@
     ];
     let cart = { qty_original:0, qty_custard:0, qty_peanut:0, qty_matcha:0, qty_chocolate:0 };
 
-    // --- 頁面 2 初始化 ---
+    // 初始化品項清單
     const listEl = document.getElementById('item-list');
     flavors.forEach(f => {
         listEl.innerHTML += `
@@ -211,7 +210,7 @@
         cart[id] = val;
     }
 
-    // --- 驗證邏輯 ---
+    // 驗證輸入內容
     function checkValid(el, min) {
         const val = el.value.trim();
         let ok = false;
@@ -248,50 +247,58 @@
         window.scrollTo(0,0);
     }
 
-    // --- 計算與運費 ---
+    // 關鍵邏輯：查看明細與拆箱警告
     function renderSummary() {
-        let subtotal = 0, totalQty = 0, html = '';
+        let subtotal = 0, totalQty = 0, itemsHtml = '';
         flavors.forEach(f => {
             if(cart[f.id] > 0) {
                 let itemTotal = cart[f.id] * f.price;
-                html += `<p style="display:flex; justify-content:space-between;"><span>${f.name} x ${cart[f.id]}</span> <span>$${itemTotal}</span></p>`;
+                itemsHtml += `<p style="display:flex; justify-content:space-between;"><span>${f.name} x ${cart[f.id]}</span> <span>$${itemTotal}</span></p>`;
                 subtotal += itemTotal;
                 totalQty += cart[f.id];
             }
         });
 
-        if(subtotal === 0) return alert("請至少挑選一個品項");
+        if(subtotal === 0) return alert("請至少挑選一個品項喔！");
 
         const boxes = Math.ceil(totalQty / 45);
         const shippingFee = subtotal >= 3000 ? 0 : (boxes * 160);
         const finalTotal = subtotal + shippingFee;
 
-        let summaryHtml = `
-            ${html}
-            <hr style="border: 0.5px dashed #ccc; margin: 10px 0;">
-            <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
-            <div style="margin-top: 10px;">
-                <p style="display:flex; justify-content:space-between; margin: 0;">
-                    <span>運費(另計)</span> 
-                    <span style="color: ${shippingFee === 0 ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight: bold;">
-                        ${shippingFee}元
-                    </span>
-                </p>
-                <p style="font-size: 0.85rem; color: black; line-height: 1.5; margin-top: 5px;">
-                    ※ 滿 3000 元免運；未滿 3000 元每件加收運費 160 元。<br>
-                    您的訂單共 <strong>${totalQty}</strong> 顆，將拆為 <strong>${boxes}</strong> 箱配送。
-                    ${shippingFee === 0 ? '<br><b style="color:var(--ghibli-green);">✨ 已達免運門檻！</b>' : ''}
-                </p>
-            </div>
-        `;
+        // 彈窗警告邏輯
+        const confirmMsg = `您的訂單共 ${totalQty} 顆，將拆為 ${boxes} 箱配送。\n\n「確認」：查看訂購明細\n「取消」：返回修改數量`;
+        
+        if (confirm(confirmMsg)) {
+            // 使用者點選確認 -> 顯示明細頁面
+            let summaryHtml = `
+                ${itemsHtml}
+                <hr style="border: 0.5px dashed #ccc; margin: 10px 0;">
+                <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
+                <div style="margin-top: 10px;">
+                    <p style="display:flex; justify-content:space-between; margin: 0;">
+                        <span>運費(另計)</span> 
+                        <span style="color: ${shippingFee === 0 ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight: bold;">
+                            ${shippingFee}元
+                        </span>
+                    </p>
+                    <p style="font-size: 0.85rem; color: black; line-height: 1.5; margin-top: 5px;">
+                        ※ 滿 3000 元免運；未滿 3000 元每件加收運費 160 元。<br>
+                        您的訂單共 <strong>${totalQty}</strong> 顆，將拆為 <strong>${boxes}</strong> 箱配送。
+                        ${shippingFee === 0 ? '<br><b style="color:var(--ghibli-green);">✨ 已達免運門檻！</b>' : ''}
+                    </p>
+                </div>
+            `;
 
-        document.getElementById('summary-content').innerHTML = summaryHtml;
-        document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${finalTotal}</span>`;
-        document.getElementById('modal-amt').innerText = finalTotal;
-        goPage(3);
+            document.getElementById('summary-content').innerHTML = summaryHtml;
+            document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${finalTotal}</span>`;
+            document.getElementById('modal-amt').innerText = finalTotal;
+            goPage(3);
+        } else {
+            // 使用者點選取消/修改數量 -> 留在原頁面（Page 2）
+            return;
+        }
     }
 
-    // --- 彈窗與送出 ---
     function openModal() { document.getElementById('modal').style.display='flex'; }
     function closeModal() { document.getElementById('modal').style.display='none'; }
     function copyAccount() {
