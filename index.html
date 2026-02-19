@@ -279,7 +279,7 @@
                 <hr style="border: 0.5px dashed #ccc; margin: 10px 0;">
                 <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
                 <p style="display:flex; justify-content:space-between; margin:0;"><span>運費</span> <span style="color:${shippingFee===0?'green':'red'}">${shippingFee}元</span></p>
-                <p style="font-size:0.85rem; color:#666; margin-top:5px;">※ 滿 3000 免運；未滿則每箱 160 元。<br>共拆裝 <b>${boxes}</b> 箱配送。</p>
+                <p style="font-size:0.85rem; color:#666; margin-top:5px;">※ 滿 3000 免運；未滿則每箱 160 元。</p>
             `;
             document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${finalTotal}</span>`;
             document.getElementById('modal-amt').innerText = finalTotal;
@@ -339,4 +339,5 @@
 </script>
 </body>
 </html>
+
 
