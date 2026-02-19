@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>夢幻甜點森林 | 生甜甜圈團購系統</title>
+    <title>將村手作甜點 | 宅配訂購單</title>
     <style>
         :root {
             --ghibli-cream: #FDF5E6;
@@ -235,10 +235,11 @@
     // --- 3. 團購品項設定 ---
     const flavors = [
         {id:'qty_original', name:'原味(無內餡)', price:50},
-        {id:'qty_custard', name:'卡士達醬', price:70},
-        {id:'qty_matcha', name:'抹茶風味', price:60},
-        {id:'qty_chocolate', name:'苦甜巧克力', price:60},
-        {id:'qty_peanut', name:'香濃花生', price:60}
+        {id:'qty_custard', name:'卡士達', price:70},
+        {id:'qty_peanut', name:'花生', price:70}
+        {id:'qty_matcha', name:'抹茶', price:80},
+        {id:'qty_chocolate', name:'可可', price:80},
+        
     ];
     let cart = { qty_original:0, qty_custard:0, qty_matcha:0, qty_chocolate:0, qty_peanut:0 };
     const listEl = document.getElementById('item-list');
@@ -379,6 +380,7 @@
 </script>
 </body>
 </html>
+
 
 
 
