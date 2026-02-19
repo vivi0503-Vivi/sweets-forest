@@ -10,7 +10,12 @@
         }
         body { font-family: -apple-system, "Noto Sans TC", sans-serif; background-color: var(--ghibli-cream); color: var(--ghibli-brown); margin: 0; -webkit-tap-highlight-color: transparent; }
         .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; padding: 20px; box-sizing: border-box; padding-bottom: 100px; }
-        h1 { text-align: center; color: var(--ghibli-green); font-size: 1.4rem; margin-bottom: 25px; }
+        
+        /* Logo 與標題區域樣式 */
+        .header-section { text-align: center; margin-bottom: 25px; }
+        .logo-img { width: 180px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+        h1 { color: var(--ghibli-green); font-size: 1.4rem; margin: 0; }
+
         .page { display: none; }
         .active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -33,12 +38,16 @@
         .modal-body { background: var(--ghibli-cream); padding: 25px; border-radius: 25px; width: 100%; border: 3px solid var(--ghibli-brown); text-align: center; max-width: 400px; }
         .hint-text { font-size: 0.8rem; color: #666; margin-top: 4px; }
         .error-hint { color: var(--error-red); font-weight: bold; }
+        .free-shipping-tag { color: var(--ghibli-green); font-weight: bold; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h1>🥐 將村手作甜點 | 宅配訂購單</h1>
+    <div class="header-section">
+        <img src="https://lh3.googleusercontent.com/d/1H7O-7j8-9rE-p_k5p-O89rE-p_k5p-O8=w1000" alt="將村手作甜點Logo" class="logo-img">
+        <h1>將村手作甜點 | 宅配訂購單</h1>
+    </div>
 
     <div id="page1" class="page active">
         <div class="card">
@@ -56,8 +65,16 @@
     </div>
 
     <div id="page3" class="page">
-        <div class="card"><h3>📖 訂購明細</h3><div id="summary-content" style="line-height: 1.8;"></div><hr style="border: 0.5px dashed var(--ghibli-brown); margin: 15px 0;"><h3 id="final-total" style="text-align: right; margin: 0;"></h3></div>
-        <div class="bottom-nav"><button class="btn btn-secondary" onclick="goPage(2)">修改數量</button><button class="btn btn-primary" onclick="openModal()">確認匯款資訊</button></div>
+        <div class="card">
+            <h3>📖 訂購明細</h3>
+            <div id="summary-content" style="line-height: 1.8;"></div>
+            <hr style="border: 0.5px dashed var(--ghibli-brown); margin: 15px 0;">
+            <h3 id="final-total" style="text-align: right; margin: 0;"></h3>
+        </div>
+        <div class="bottom-nav">
+            <button class="btn btn-secondary" onclick="goPage(2)">修改數量</button>
+            <button class="btn btn-primary" onclick="openModal()">確認匯款資訊</button>
+        </div>
     </div>
 </div>
 
@@ -115,8 +132,10 @@
     function validateQtyInput(el, id) { el.value = el.value.replace(/[^0-9]/g, ''); cart[id] = parseInt(el.value) || 0; }
     function updateQty(id, delta) {
         const input = document.getElementById(`q-${id}`);
-        let val = Math.max(0, (parseInt(input.value) || 0) + delta);
-        input.value = val; cart[id] = val;
+        let val = (parseInt(input.value) || 0) + delta;
+        val = Math.max(0, val);
+        input.value = val;
+        cart[id] = val;
     }
 
     function checkValid(el, min) {
@@ -149,12 +168,26 @@
             }
         });
         if(subtotal === 0) return alert("請至少挑選一個品項喔！");
+        
         const boxes = Math.ceil(totalQty / 45);
-        const ship = subtotal >= 3000 ? 0 : (boxes * 160);
-        if (confirm(`共 ${totalQty} 顆，拆為 ${boxes} 箱。是否查看明細？`)) {
-            document.getElementById('summary-content').innerHTML = itemsHtml + `<hr><p style="display:flex;justify-content:space-between;"><b>小計</b> <b>$${subtotal}</b></p><p style="display:flex;justify-content:space-between;"><span>運費</span> <span style="color:${ship===0?'green':'red'}">${ship}元</span></p>`;
-            document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${subtotal + ship}</span>`;
-            document.getElementById('modal-amt').innerText = subtotal + ship;
+        const shippingFee = subtotal >= 3000 ? 0 : (boxes * 160);
+        const isFree = subtotal >= 3000;
+
+        if (confirm(`您的訂單共 ${totalQty} 顆，將拆為 ${boxes} 箱配送。\n\n「確認」：查看訂購明細\n「取消」：返回修改數量`)) {
+            let summaryContentHtml = itemsHtml + `<hr style="border: 0.5px dashed #ccc; margin: 10px 0;">`;
+            summaryContentHtml += `<p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>`;
+            
+            summaryContentHtml += `
+                <p style="display:flex; justify-content:space-between; margin:0;">
+                    <span>運費(另計) ${isFree ? '<small class="free-shipping-tag">(已達免運)</small>' : ''}</span> 
+                    <span style="color:${isFree ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight:bold;">${shippingFee}元</span>
+                </p>
+                <p style="font-size:0.85rem; color:#666; margin-top:5px; line-height:1.4;">
+                    ※ 滿 3000 元免運；未滿則每箱 160 元。</p>`;
+
+            document.getElementById('summary-content').innerHTML = summaryContentHtml;
+            document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${subtotal + shippingFee}</span>`;
+            document.getElementById('modal-amt').innerText = subtotal + shippingFee;
             goPage(3);
         }
     }
@@ -187,19 +220,16 @@
             last_five: lastFive
         };
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIikJ6dZZwOOrShWrUUGgBEatzQQjPMGPFlAIcPwy8bhIhoYXDB_nS11cZpxgUYvFYng/exec'; // <--- 請確保這裡是最新網址
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIikJ6dZZwOOrShWrUUGgBEatzQQjPMGPFlAIcPwy8bhIhoYXDB_nS11cZpxgUYvFYng/exec'; 
 
-        // 重點修正：使用 no-cors 模式並確保 then 能觸發
         fetch(scriptURL, {
             method: 'POST',
-            mode: 'no-cors', // 解決 Google Apps Script 跳轉產生的 CORS 錯誤
+            mode: 'no-cors', 
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData)
         })
         .then(() => {
-            // 在 no-cors 模式下，我們無法讀取回應內容，
-            // 但只要 fetch 完成（不論成功或不透明錯誤），我們就假設成功並顯示畫面。
             localStorage.setItem('order_lock', 'true');
             setTimeout(() => localStorage.removeItem('order_lock'), 120000);
             
@@ -222,5 +252,3 @@
 </script>
 </body>
 </html>
-
-
