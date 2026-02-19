@@ -211,4 +211,155 @@
     });
 
     function validateQtyInput(el, id) {
-        el.value = el.value.replace(/[^0-9]/
+        el.value = el.value.replace(/[^0-9]/g, '');
+        cart[id] = parseInt(el.value) || 0;
+    }
+
+    function updateQty(id, delta) {
+        const input = document.getElementById(`q-${id}`);
+        let val = (parseInt(input.value) || 0) + delta;
+        val = Math.max(0, val);
+        input.value = val;
+        cart[id] = val;
+    }
+
+    function checkValid(el, min) {
+        const val = el.value.trim();
+        let ok = false;
+        if (el.id === 'address') {
+            const addrPattern = /.+[縣|市].+[區|鄉|鎮|市|里|村].+/;
+            ok = addrPattern.test(val) && val.length >= 8;
+        } else {
+            ok = val.length >= min;
+        }
+        el.classList.toggle('valid-input', ok);
+    }
+
+    function handleGoPage2() {
+        const addr = document.getElementById('address').value.trim();
+        const hasCity = addr.includes('縣') || addr.includes('市');
+        const hasDist = addr.includes('區') || addr.includes('鄉') || addr.includes('鎮') || addr.includes('市') || addr.includes('里') || addr.includes('村');
+        const hasRoad = addr.includes('路') || addr.includes('街') || addr.includes('大道') || addr.includes('段');
+
+        if (document.getElementById('name').value.trim() === "") return alert("請輸入訂購姓名");
+        if (document.getElementById('phone').value.length !== 10) return alert("電話需為 10 碼數字");
+        if (document.getElementById('zipcode').value.length < 3) return alert("郵遞區號至少 3 碼");
+        if (!hasCity || !hasDist || !hasRoad || addr.length < 8) {
+            return alert("地址格式錯誤：請依序包含「縣市」、「區/鄉/鎮」及「路名」。");
+        }
+        goPage(2);
+    }
+
+    function goPage(n) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page' + n).classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function renderSummary() {
+        let subtotal = 0, totalQty = 0, itemsHtml = '';
+        flavors.forEach(f => {
+            if(cart[f.id] > 0) {
+                let itemTotal = cart[f.id] * f.price;
+                itemsHtml += `<p style="display:flex; justify-content:space-between;"><span>${f.name} x ${cart[f.id]}</span> <span>$${itemTotal}</span></p>`;
+                subtotal += itemTotal;
+                totalQty += cart[f.id];
+            }
+        });
+
+        if(subtotal === 0) return alert("請至少挑選一個品項喔！");
+
+        const boxes = Math.ceil(totalQty / 45);
+        const shippingFee = subtotal >= 3000 ? 0 : (boxes * 160);
+        const finalTotal = subtotal + shippingFee;
+
+        if (confirm(`您的訂單共 ${totalQty} 顆，將拆為 ${boxes} 箱配送。\n\n「確認」：查看訂購明細\n「取消」：返回修改數量`)) {
+            document.getElementById('summary-content').innerHTML = `
+                ${itemsHtml}
+                <hr style="border: 0.5px dashed #ccc; margin: 10px 0;">
+                <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
+                <p style="display:flex; justify-content:space-between; margin:0;"><span>運費</span> <span style="color:${shippingFee===0?'green':'red'}">${shippingFee}元</span></p>
+                <p style="font-size:0.85rem; color:#666; margin-top:5px;">※ 滿 3000 免運；未滿則每箱 160 元。</p>
+            `;
+            document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${finalTotal}</span>`;
+            document.getElementById('modal-amt').innerText = finalTotal;
+            goPage(3);
+        }
+    }
+
+    function openModal() { document.getElementById('modal').style.display='flex'; }
+    function closeModal() { document.getElementById('modal').style.display='none'; }
+    function copyAccount() {
+        const acc = "24414400800351";
+        const el = document.createElement('textarea'); el.value = acc; 
+        document.body.appendChild(el); el.select(); document.execCommand('copy');
+        document.body.removeChild(el); alert("帳號已複製");
+    }
+
+    function finalSubmit() {
+        // 檢查防重複下單
+        if (localStorage.getItem('order_lock')) return alert("訂單處理中，請勿重複提交。");
+
+        const lastFiveInput = document.getElementById('lastFive').value.trim();
+        
+        // 驗證後五碼：必須為 5 位，且全為數字
+        if (!/^\d{5}$/.test(lastFiveInput)) {
+            return alert("⚠️ 錯誤：匯款後五碼必須為「5位數字」，不能包含空白或文字。");
+        }
+
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "傳送中...";
+        btn.disabled = true;
+
+        const now = new Date();
+        const orderDate = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
+        const orderTime = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+
+        const orderData = {
+            order_date: orderDate,
+            order_time: orderTime,
+            name: document.getElementById('name').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            zipcode: document.getElementById('zipcode').value.trim(),
+            address: document.getElementById('address').value.trim(),
+            ...cart,
+            total_price: document.getElementById('modal-amt').innerText,
+            last_five: lastFiveInput
+        };
+
+        // GAS URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx8cwC5iOcUdpjshFuIObSgOjIT2zaGp8MIFqb1AALvswW3cDshCLPbtBm-zd7ngo1ZBg/exec';
+
+        // 改用更能與 no-cors 相容的提交方式
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        }).then(() => {
+            // 設定鎖定防止重複
+            localStorage.setItem('order_lock', 'true');
+            setTimeout(() => localStorage.removeItem('order_lock'), 120000);
+
+            // 成功顯示
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('success-modal').style.display = 'flex';
+            let s = 120;
+            const timer = setInterval(() => { 
+                s--; 
+                document.getElementById('countdown').innerText = s; 
+                if(s <= 0) { 
+                    clearInterval(timer); 
+                    location.reload(); 
+                }
+            }, 1000);
+        }).catch(err => {
+            alert("訂單送出發生異常，請確認網路連線或聯絡店家。");
+            btn.innerText = "確認並送出訂單";
+            btn.disabled = false;
+        });
+    }
+</script>
+</body>
+</html>
