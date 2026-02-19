@@ -70,7 +70,7 @@
             <div class="form-group"><label>訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="請填寫姓名" oninput="checkValid(this, 1)"></div>
             <div class="form-group"><label>訂購人電話 (10碼數字)</label><input type="tel" id="phone" maxlength="10" placeholder="例：0912345678;家用電話需加上區碼為0228957766" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)"></div>
             <div class="form-group"><label>宅配郵遞區號 (3碼或是5碼)</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：241" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 3)"></div>
-            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="新北市三重區成功路..." oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
+            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="臺北市北投區大同街317號1樓" oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
         </div>
         <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 →</button></div>
     </div>
@@ -270,4 +270,5 @@
 </script>
 </body>
 </html>
+
 
