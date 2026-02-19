@@ -105,7 +105,7 @@
 <body>
 
 <div class="app-container">
-    <h1>🥐 夢幻甜點世界團購</h1>
+    <h1>🥐 將村手作甜點 | 宅配訂購單</h1>
 
     <div id="page1" class="page active">
         <div class="card">
@@ -146,6 +146,7 @@
             <hr style="border: 0.5px dashed var(--ghibli-brown); margin: 15px 0;">
             <h3 id="final-total" style="text-align: right; color: var(--error-red);"></h3>
         </div>
+        <label>滿3000元免運；未滿3000元每件加收運費160元</label>
         <div class="bottom-nav">
             <button class="btn btn-secondary" onclick="goPage(2)">修改數量</button>
             <button class="btn btn-primary" onclick="openModal()">確認匯款資訊</button>
@@ -157,9 +158,9 @@
     <div class="modal-body">
         <h3>💰 匯款帳戶資訊</h3>
         <div style="background: white; padding: 15px; border-radius: 15px; border: 2px dashed var(--ghibli-brown); text-align: left; margin-bottom: 15px; position: relative;">
-            <strong>銀行代碼：</strong> 822 (中國信託)<br>
-            <strong>匯款帳號：</strong> <span id="acc-num" style="letter-spacing: 1px;">123456789012</span><br>
-            <strong>戶名：</strong> 夢幻甜點工作室<br>
+            <strong>銀行代碼：</strong> 700 (郵局)<br>
+            <strong>匯款帳號：</strong> <span id="acc-num" style="letter-spacing: 1px;">24414400800351</span><br>
+            <strong>戶名：</strong> 莊詠茗<br>
             <button onclick="copyAccount()" style="margin-top: 10px; width: 100%; border-radius: 10px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; cursor: pointer;">📋 一鍵複製帳號</button>
             <span id="copy-tip" style="display:none; color: var(--ghibli-green); font-size: 0.8rem; position: absolute; top: 10px; right: 10px; font-weight: bold;">已複製!</span>
         </div>
@@ -181,7 +182,8 @@
             <strong>後續處理流程：</strong><br>
             1. 系統將於 24H 內自動對帳。<br>
             2. 對帳完成店家會使用LINE@通知訂單成立。<br>
-            3. 下單後於7-14天不含假日為出貨日期，出貨當日會使用LINE@通知。
+            3. 出貨日為下單7-14天(不含假日)。
+            4. 出貨當天將以LINE@通知。
         </div>
         <p style="color: gray; font-size: 0.8rem; margin-top: 15px;">
             此視窗將於 <span id="countdown" style="color:var(--error-red); font-weight:bold;">120</span> 秒後自動重置。
@@ -236,9 +238,9 @@
     const flavors = [
         {id:'qty_original', name:'原味(無內餡)', price:50},
         {id:'qty_custard', name:'卡士達', price:70},
-        {id:'qty_peanut', name:'花生', price:70}
+        {id:'qty_peanut', name:'花生', price:70},
         {id:'qty_matcha', name:'抹茶', price:80},
-        {id:'qty_chocolate', name:'可可', price:80},
+        {id:'qty_chocolate', name:'可可', price:80}
         
     ];
     let cart = { qty_original:0, qty_custard:0, qty_matcha:0, qty_chocolate:0, qty_peanut:0 };
@@ -253,6 +255,7 @@
                     <button class="qty-btn" onclick="updateQty('${f.id}', 1)">+</button>
                 </div>
             </div>`;
+        <label>一箱最多可以放45顆</label>
     });
 
     function updateQty(id, delta) {
@@ -341,7 +344,7 @@
             last_five: lastFive
         };
 
-        fetch('https://script.google.com/macros/s/AKfycbzW3KqssjqjoeoEB_awgXn3m083TMhhb17M6Yf-IbZtP7fBYanIuln4ICjeMAQ8v9iuyg/exec', {
+        fetch('https://script.google.com/macros/s/AKfycbwNnFkIYi0VleEDuC2e3iCBmRMDYj8KO1hjpZHJwZ16AE0fcgSW85GtaN0WL6UNnXkIOQ/exec', {
             method: 'POST',
             body: JSON.stringify(orderData)
         })
@@ -380,6 +383,7 @@
 </script>
 </body>
 </html>
+
 
 
 
