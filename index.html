@@ -11,9 +11,17 @@
         body { font-family: -apple-system, "Noto Sans TC", sans-serif; background-color: var(--ghibli-cream); color: var(--ghibli-brown); margin: 0; -webkit-tap-highlight-color: transparent; }
         .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; padding: 20px; box-sizing: border-box; padding-bottom: 100px; }
         
-        /* Logo 與標題區域樣式 */
+        /* Logo 區域樣式 */
         .header-section { text-align: center; margin-bottom: 25px; }
-        .logo-img { width: 180px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+        .logo-img { 
+            width: 180px; /* 您可以在這裡調整 Logo 寬度 */
+            max-width: 80%;
+            height: auto; 
+            margin-bottom: 10px; 
+            display: block; 
+            margin-left: auto; 
+            margin-right: auto; 
+        }
         h1 { color: var(--ghibli-green); font-size: 1.4rem; margin: 0; }
 
         .page { display: none; }
@@ -25,15 +33,20 @@
         input { width: 100%; height: 50px; font-size: 1rem; padding: 0 15px; border: 1.5px solid #DDD; border-radius: 12px; box-sizing: border-box; }
         input:focus { border-color: var(--ghibli-green); outline: none; }
         .valid-input { border-color: var(--ghibli-green) !important; background-color: #fafffa; }
+        
+        /* 品項列表 */
         .flavor-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #F0F0F0; }
         .qty-control { display: flex; align-items: center; gap: 8px; }
         .qty-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--ghibli-green); background: white; color: var(--ghibli-green); font-size: 1.2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; }
         .qty-input { width: 60px; text-align: center; border: 1.5px solid var(--ghibli-green); border-radius: 8px; height: 38px; font-size: 1.1rem; font-weight: bold; color: var(--ghibli-brown); }
+        
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); display: flex; gap: 10px; max-width: 500px; margin: 0 auto; z-index: 99; }
         .btn { flex: 1; height: 55px; border-radius: 30px; border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: var(--ghibli-green); color: white; }
         .btn-secondary { background: #EEE; color: var(--ghibli-brown); flex: 0.4; }
         .btn:disabled { background: #ccc !important; cursor: not-allowed; }
+        
+        /* 彈窗樣式 */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-body { background: var(--ghibli-cream); padding: 25px; border-radius: 25px; width: 100%; border: 3px solid var(--ghibli-brown); text-align: center; max-width: 400px; }
         .hint-text { font-size: 0.8rem; color: #666; margin-top: 4px; }
@@ -45,16 +58,19 @@
 
 <div class="app-container">
     <div class="header-section">
-        <img src="https://lh3.googleusercontent.com/d/1H7O-7j8-9rE-p_k5p-O89rE-p_k5p-O8=w1000" alt="將村手作甜點Logo" class="logo-img">
-        <h1>將村手作甜點 | 宅配訂購單</h1>
+        <img src="https://scontent.ftpe3-1.fna.fbcdn.net/v/t39.30808-6/305406763_542794297644069_6275812267100319693_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=laUY6m_0sPgQ7kNvwF6XHZx&_nc_oc=AdnlFb2RrncQz_4j1tDjN40OHbexaQijywymExKgZxG_JIZX98s0VIu_Rl1itDYzd7M2HN9UmrNbS8PbVZUwFpMY&_nc_zt=23&_nc_ht=scontent.ftpe3-1.fna&_nc_gid=Kc8zWIy_HXX6-VXER1aBBQ&oh=00_Aftqh1mr-oX0ax96zkL4mXZs6SzMw5-2DRg0iK7pUUXJ4A&oe=699D1CEC" 
+             alt="將村手作甜點" 
+             class="logo-img" 
+             onerror="this.style.display='none';">
+        <h1>宅配訂購單</h1>
     </div>
 
     <div id="page1" class="page active">
         <div class="card">
             <div class="form-group"><label>訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="請填寫姓名" oninput="checkValid(this, 1)"></div>
-            <div class="form-group"><label>訂購人電話 (10碼數字)</label><input type="tel" id="phone" maxlength="10" placeholder="例：0912345678" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)"></div>
-            <div class="form-group"><label>宅配郵遞區號</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：241" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 3)"></div>
-            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="新北市三重區成功路..." oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街名稱</p></div>
+            <div class="form-group"><label>訂購人電話 (10碼數字)</label><input type="tel" id="phone" maxlength="10" placeholder="例：0912345678;家用電話需加上區碼為0228957766" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)"></div>
+            <div class="form-group"><label>宅配郵遞區號 (3碼或是5碼)</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：241" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 3)"></div>
+            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="新北市三重區成功路..." oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
         </div>
         <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 →</button></div>
     </div>
@@ -99,7 +115,9 @@
     <div class="modal-body">
         <h2 style="color: var(--ghibli-green);">🎉 訂單已受理！</h2>
         <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px;">
-            1. 系統將於 24H 內自動對帳。<br>2. 對帳完成將發送確認。<br>3. 排單製作後宅配寄出。
+            1. 系統將於 24H 內自動對帳。<br>
+            2. 對帳完成將發送確認。<br>
+            3. 排單製作後宅配寄出。
         </div>
         <p>視窗將於 <span id="countdown">120</span> 秒後重置。</p>
         <button class="btn btn-primary" onclick="location.reload()">回首頁</button>
@@ -107,6 +125,9 @@
 </div>
 
 <script>
+    // 【重要：請在此貼上您的 GAS 部署網址】
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzIikJ6dZZwOOrShWrUUGgBEatzQQjPMGPFlAIcPwy8bhIhoYXDB_nS11cZpxgUYvFYng/exec'; 
+
     const flavors = [
         {id:'qty_original', name:'原味(無內餡)', price:50},
         {id:'qty_custard', name:'卡士達', price:70},
@@ -132,10 +153,8 @@
     function validateQtyInput(el, id) { el.value = el.value.replace(/[^0-9]/g, ''); cart[id] = parseInt(el.value) || 0; }
     function updateQty(id, delta) {
         const input = document.getElementById(`q-${id}`);
-        let val = (parseInt(input.value) || 0) + delta;
-        val = Math.max(0, val);
-        input.value = val;
-        cart[id] = val;
+        let val = Math.max(0, (parseInt(input.value) || 0) + delta);
+        input.value = val; cart[id] = val;
     }
 
     function checkValid(el, min) {
@@ -146,7 +165,7 @@
 
     function handleGoPage2() {
         const addr = document.getElementById('address').value.trim();
-        if (document.getElementById('name').value === "" || document.getElementById('phone').value.length !== 10 || addr.length < 8) {
+        if (document.getElementById('name').value.trim() === "" || document.getElementById('phone').value.length !== 10 || addr.length < 8) {
             return alert("請填寫完整正確的資訊！");
         }
         goPage(2);
@@ -170,8 +189,8 @@
         if(subtotal === 0) return alert("請至少挑選一個品項喔！");
         
         const boxes = Math.ceil(totalQty / 45);
-        const shippingFee = subtotal >= 3000 ? 0 : (boxes * 160);
         const isFree = subtotal >= 3000;
+        const shippingFee = isFree ? 0 : (boxes * 160);
 
         if (confirm(`您的訂單共 ${totalQty} 顆，將拆為 ${boxes} 箱配送。\n\n「確認」：查看訂購明細\n「取消」：返回修改數量`)) {
             let summaryContentHtml = itemsHtml + `<hr style="border: 0.5px dashed #ccc; margin: 10px 0;">`;
@@ -183,7 +202,8 @@
                     <span style="color:${isFree ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight:bold;">${shippingFee}元</span>
                 </p>
                 <p style="font-size:0.85rem; color:#666; margin-top:5px; line-height:1.4;">
-                    ※ 滿 3000 元免運；未滿則每箱 160 元。</p>`;
+                    ※ 滿 3000 元免運；未滿則每箱 160 元。
+                </p>`;
 
             document.getElementById('summary-content').innerHTML = summaryContentHtml;
             document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${subtotal + shippingFee}</span>`;
@@ -206,21 +226,19 @@
 
         const now = new Date();
         const orderDate = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`;
-        const orderTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        const orderTime = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
         const orderData = {
             order_date: orderDate,
             order_time: orderTime,
-            name: document.getElementById('name').value,
-            phone: document.getElementById('phone').value,
-            zipcode: document.getElementById('zipcode').value,
-            address: document.getElementById('address').value,
+            name: document.getElementById('name').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            zipcode: document.getElementById('zipcode').value.trim(),
+            address: document.getElementById('address').value.trim(),
             ...cart,
             total_price: document.getElementById('modal-amt').innerText,
             last_five: lastFive
         };
-
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIikJ6dZZwOOrShWrUUGgBEatzQQjPMGPFlAIcPwy8bhIhoYXDB_nS11cZpxgUYvFYng/exec'; 
 
         fetch(scriptURL, {
             method: 'POST',
