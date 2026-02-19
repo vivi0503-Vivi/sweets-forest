@@ -80,7 +80,7 @@
         .btn { flex: 1; height: 55px; border-radius: 30px; border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: var(--ghibli-green); color: white; }
         .btn-secondary { background: #EEE; color: var(--ghibli-brown); flex: 0.4; }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn:disabled { background: #ccc !important; cursor: not-allowed; }
 
         .modal {
             display: none; position: fixed; inset: 0;
@@ -165,8 +165,8 @@
         <p>應匯金額：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.3rem;"></strong> 元</p>
         <div class="form-group" style="text-align: left;">
             <label>請輸入匯款後五碼：</label>
-            <input type="tel" id="lastFive" maxlength="5" placeholder="5位數字">
-            <p class="hint-text error-hint">※ 請填寫轉帳「存簿帳號」末五碼，非卡號。</p>
+            <input type="tel" id="lastFive" maxlength="5" placeholder="5位數字" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <p class="hint-text error-hint">※ 請填寫轉帳「存簿帳號」末五碼，不含空白。</p>
         </div>
         <button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認並送出訂單</button>
         <p onclick="closeModal()" style="color:gray; margin-top:15px; cursor:pointer;">返回修改</p>
@@ -211,133 +211,4 @@
     });
 
     function validateQtyInput(el, id) {
-        el.value = el.value.replace(/[^0-9]/g, '');
-        cart[id] = parseInt(el.value) || 0;
-    }
-
-    function updateQty(id, delta) {
-        const input = document.getElementById(`q-${id}`);
-        let val = (parseInt(input.value) || 0) + delta;
-        val = Math.max(0, val);
-        input.value = val;
-        cart[id] = val;
-    }
-
-    function checkValid(el, min) {
-        const val = el.value.trim();
-        let ok = false;
-        if (el.id === 'address') {
-            const addrPattern = /.+[縣|市].+[區|鄉|鎮|市|里|村].+/;
-            ok = addrPattern.test(val) && val.length >= 8;
-        } else {
-            ok = val.length >= min;
-        }
-        el.classList.toggle('valid-input', ok);
-    }
-
-    function handleGoPage2() {
-        const addr = document.getElementById('address').value.trim();
-        const hasCity = addr.includes('縣') || addr.includes('市');
-        const hasDist = addr.includes('區') || addr.includes('鄉') || addr.includes('鎮') || addr.includes('市') || addr.includes('里') || addr.includes('村');
-        const hasRoad = addr.includes('路') || addr.includes('街') || addr.includes('大道') || addr.includes('段');
-
-        if (document.getElementById('name').value.trim() === "") return alert("請輸入訂購姓名");
-        if (document.getElementById('phone').value.length !== 10) return alert("電話需為 10 碼數字");
-        if (document.getElementById('zipcode').value.length < 3) return alert("郵遞區號至少 3 碼");
-        if (!hasCity || !hasDist || !hasRoad || addr.length < 8) {
-            return alert("地址格式錯誤：請依序包含「縣市」、「區/鄉/鎮」及「路名」。");
-        }
-        goPage(2);
-    }
-
-    function goPage(n) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page' + n).classList.add('active');
-        window.scrollTo(0,0);
-    }
-
-    function renderSummary() {
-        let subtotal = 0, totalQty = 0, itemsHtml = '';
-        flavors.forEach(f => {
-            if(cart[f.id] > 0) {
-                let itemTotal = cart[f.id] * f.price;
-                itemsHtml += `<p style="display:flex; justify-content:space-between;"><span>${f.name} x ${cart[f.id]}</span> <span>$${itemTotal}</span></p>`;
-                subtotal += itemTotal;
-                totalQty += cart[f.id];
-            }
-        });
-
-        if(subtotal === 0) return alert("請至少挑選一個品項喔！");
-
-        const boxes = Math.ceil(totalQty / 45);
-        const shippingFee = subtotal >= 3000 ? 0 : (boxes * 160);
-        const finalTotal = subtotal + shippingFee;
-
-        if (confirm(`您的訂單共 ${totalQty} 顆，將拆為 ${boxes} 箱配送。\n\n「確認」：查看訂購明細\n「取消」：返回修改數量`)) {
-            document.getElementById('summary-content').innerHTML = `
-                ${itemsHtml}
-                <hr style="border: 0.5px dashed #ccc; margin: 10px 0;">
-                <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
-                <p style="display:flex; justify-content:space-between; margin:0;"><span>運費</span> <span style="color:${shippingFee===0?'green':'red'}">${shippingFee}元</span></p>
-                <p style="font-size:0.85rem; color:#666; margin-top:5px;">※ 滿 3000 免運；未滿則每箱 160 元。</p>
-            `;
-            document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${finalTotal}</span>`;
-            document.getElementById('modal-amt').innerText = finalTotal;
-            goPage(3);
-        }
-    }
-
-    function openModal() { document.getElementById('modal').style.display='flex'; }
-    function closeModal() { document.getElementById('modal').style.display='none'; }
-    function copyAccount() {
-        const el = document.createElement('textarea'); el.value = "24414400800351";
-        document.body.appendChild(el); el.select(); document.execCommand('copy');
-        document.body.removeChild(el); alert("帳號已複製");
-    }
-
-    function finalSubmit() {
-        if (localStorage.getItem('order_lock')) return alert("訂單處理中，請稍候...");
-        const lastFive = document.getElementById('lastFive').value.trim();
-        if (lastFive.length !== 5) return alert("請輸入匯款後五碼");
-
-        const btn = document.getElementById('submit-btn');
-        btn.innerText = "傳送中..."; btn.disabled = true;
-
-        // 拆分日期與時間
-        const now = new Date();
-        const orderDate = now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + now.getDate();
-        const orderTime = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
-
-        const orderData = {
-            order_date: orderDate,
-            order_time: orderTime,
-            name: document.getElementById('name').value,
-            phone: document.getElementById('phone').value,
-            zipcode: document.getElementById('zipcode').value,
-            address: document.getElementById('address').value,
-            ...cart,
-            total_price: document.getElementById('modal-amt').innerText,
-            last_five: lastFive
-        };
-
-        fetch('https://script.google.com/macros/s/AKfycbwDovz7L2shfL-8-1XY9NfhuN8GCqiThlFnzJLWrarOMgYDAoh8FryYFC6NPFbf6zcyLA/exec', {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(orderData)
-        }).then(() => {
-            localStorage.setItem('order_lock', 'true');
-            setTimeout(() => localStorage.removeItem('order_lock'), 120000);
-            document.getElementById('modal').style.display = 'none';
-            document.getElementById('success-modal').style.display = 'flex';
-            let s = 120;
-            const timer = setInterval(() => { 
-                s--; document.getElementById('countdown').innerText = s; 
-                if(s<=0) { clearInterval(timer); location.reload(); }
-            }, 1000);
-        });
-    }
-</script>
-</body>
-</html>
-
-
+        el.value = el.value.replace(/[^0-9]/
