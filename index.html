@@ -9,7 +9,6 @@
             --ghibli-cream: #FDF5E6;
             --ghibli-green: #6B8E23;
             --ghibli-brown: #5D4037;
-            --ghibli-pink: #FFB6C1;
             --error-red: #D32F2F;
         }
 
@@ -30,8 +29,8 @@
 
         h1 { text-align: center; color: var(--ghibli-green); font-size: 1.4rem; margin-bottom: 25px; }
 
-        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .active { display: block; }
+        .page { display: none; }
+        .active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card {
@@ -49,7 +48,7 @@
             border-radius: 12px; box-sizing: border-box;
             transition: all 0.3s ease;
         }
-        input:focus { border-color: var(--ghibli-green); outline: none; box-shadow: 0 0 5px rgba(107,142,35,0.2); }
+        input:focus { border-color: var(--ghibli-green); outline: none; }
         
         .valid-input { border-color: var(--ghibli-green) !important; background-color: #fafffa; }
 
@@ -119,7 +118,7 @@
             </div>
         </div>
         <div class="bottom-nav">
-            <button class="btn btn-primary" onclick="goPage(2)">下一步：挑選風味 →</button>
+            <button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 →</button>
         </div>
     </div>
 
@@ -153,8 +152,182 @@
 <div id="modal" class="modal">
     <div class="modal-body">
         <h3>💰 匯款帳戶資訊</h3>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 2px dashed var(--ghibli-brown); text-align: left; margin-bottom: 15px; position: relative;">
-            <strong>銀行代碼：</strong> 700 (郵局)<br>
-            <strong>匯款帳號：</strong> <span id="acc-num">24414400800351</span><br>
-            <strong>戶名：</strong> 莊詠茗<br>
-            <button onclick="copyAccount()" style="margin-top: 10px; width: 100%; border-radius: 10px; border: 1px solid #ccc; padding: 8px
+        <div style="background: white; padding: 15px; border-radius: 15px; border: 2px dashed var(--ghibli-brown); text-align: left; margin-bottom: 15px;">
+            <strong>銀行：</strong> 700 (郵局)<br>
+            <strong>帳號：</strong> <span id="acc-num">24414400800351</span><br>
+            <strong>戶名：</strong> 莊詠茗
+            <button onclick="copyAccount()" style="margin-top: 10px; width: 100%; border-radius: 10px; padding: 8px;">複製帳號</button>
+        </div>
+        <p>應匯金額：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.3rem;"></strong> 元</p>
+        <input type="tel" id="lastFive" maxlength="5" placeholder="請輸入匯款後五碼" style="margin-bottom: 15px;">
+        <button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認並送出訂單</button>
+        <p onclick="closeModal()" style="color:gray; margin-top:10px; cursor:pointer;">返回</p>
+    </div>
+</div>
+
+<div id="success-modal" class="modal">
+    <div class="modal-body">
+        <h2 style="color: var(--ghibli-green);">🎉 訂單已受理！</h2>
+        <p>視窗將於 <span id="countdown">120</span> 秒後重置。</p>
+        <button class="btn btn-primary" style="width: 100%;" onclick="location.reload()">回首頁</button>
+    </div>
+</div>
+
+<script>
+    // --- 數據 ---
+    const flavors = [
+        {id:'qty_original', name:'原味(無內餡)', price:50},
+        {id:'qty_custard', name:'卡士達', price:70},
+        {id:'qty_peanut', name:'花生', price:70},
+        {id:'qty_matcha', name:'抹茶', price:80},
+        {id:'qty_chocolate', name:'可可', price:80}
+    ];
+    let cart = { qty_original:0, qty_custard:0, qty_peanut:0, qty_matcha:0, qty_chocolate:0 };
+
+    // --- 頁面 2 初始化 ---
+    const listEl = document.getElementById('item-list');
+    flavors.forEach(f => {
+        listEl.innerHTML += `
+            <div class="flavor-item">
+                <div class="flavor-info"><strong>${f.name}</strong><br><small>NT$ ${f.price}</small></div>
+                <div class="qty-control">
+                    <button class="qty-btn" onclick="updateQty('${f.id}', -1)">-</button>
+                    <input type="tel" class="qty-input" id="q-${f.id}" value="0" maxlength="3" oninput="validateQtyInput(this, '${f.id}')">
+                    <button class="qty-btn" onclick="updateQty('${f.id}', 1)">+</button>
+                </div>
+            </div>`;
+    });
+
+    function validateQtyInput(el, id) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+        cart[id] = parseInt(el.value) || 0;
+    }
+
+    function updateQty(id, delta) {
+        const input = document.getElementById(`q-${id}`);
+        let val = (parseInt(input.value) || 0) + delta;
+        val = Math.max(0, val);
+        input.value = val;
+        cart[id] = val;
+    }
+
+    // --- 驗證邏輯 ---
+    function checkValid(el, min) {
+        const val = el.value.trim();
+        let ok = false;
+        if (el.id === 'address') {
+            ok = val.length >= 5 && (val.indexOf('縣')>-1 || val.indexOf('市')>-1) && (val.indexOf('區')>-1 || val.indexOf('鄉')>-1 || val.indexOf('鎮')>-1 || val.indexOf('市')>-1);
+        } else {
+            ok = val.length >= min;
+        }
+        el.classList.toggle('valid-input', ok);
+    }
+
+    function handleGoPage2() {
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const zip = document.getElementById('zipcode').value.trim();
+        const addr = document.getElementById('address').value.trim();
+
+        if (name === "") return alert("請輸入訂購姓名");
+        if (phone.length !== 10) return alert("電話需為 10 碼數字");
+        if (zip.length < 3) return alert("郵遞區號至少 3 碼");
+        
+        const hasCity = addr.indexOf('縣') > -1 || addr.indexOf('市') > -1;
+        const hasDist = addr.indexOf('區') > -1 || addr.indexOf('鄉') > -1 || addr.indexOf('鎮') > -1 || addr.indexOf('市') > -1;
+        
+        if (!hasCity || !hasDist || addr.length < 5) {
+            return alert("地址格式錯誤：請務必包含「縣市」與「區/鄉/鎮」（例：新北市三重區）");
+        }
+        goPage(2);
+    }
+
+    function goPage(n) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page' + n).classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    // --- 計算與運費 ---
+    function renderSummary() {
+        let subtotal = 0, totalQty = 0, html = '';
+        flavors.forEach(f => {
+            if(cart[f.id] > 0) {
+                let itemTotal = cart[f.id] * f.price;
+                html += `<p style="display:flex; justify-content:space-between;"><span>${f.name} x ${cart[f.id]}</span> <span>$${itemTotal}</span></p>`;
+                subtotal += itemTotal;
+                totalQty += cart[f.id];
+            }
+        });
+
+        if(subtotal === 0) return alert("請至少挑選一個品項");
+
+        const boxes = Math.ceil(totalQty / 45);
+        const shippingFee = subtotal >= 3000 ? 0 : (boxes * 160);
+        const finalTotal = subtotal + shippingFee;
+
+        let summaryHtml = `
+            ${html}
+            <hr style="border: 0.5px dashed #ccc; margin: 10px 0;">
+            <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
+            <div style="margin-top: 10px;">
+                <p style="display:flex; justify-content:space-between; margin: 0;">
+                    <span>運費(另計)</span> 
+                    <span style="color: ${shippingFee === 0 ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight: bold;">
+                        ${shippingFee}元
+                    </span>
+                </p>
+                <p style="font-size: 0.85rem; color: black; line-height: 1.5; margin-top: 5px;">
+                    ※ 滿 3000 元免運；未滿 3000 元每件加收運費 160 元。<br>
+                    您的訂單共 <strong>${totalQty}</strong> 顆，將拆為 <strong>${boxes}</strong> 箱配送。
+                    ${shippingFee === 0 ? '<br><b style="color:var(--ghibli-green);">✨ 已達免運門檻！</b>' : ''}
+                </p>
+            </div>
+        `;
+
+        document.getElementById('summary-content').innerHTML = summaryHtml;
+        document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${finalTotal}</span>`;
+        document.getElementById('modal-amt').innerText = finalTotal;
+        goPage(3);
+    }
+
+    // --- 彈窗與送出 ---
+    function openModal() { document.getElementById('modal').style.display='flex'; }
+    function closeModal() { document.getElementById('modal').style.display='none'; }
+    function copyAccount() {
+        const acc = "24414400800351";
+        const el = document.createElement('textarea');
+        el.value = acc; document.body.appendChild(el);
+        el.select(); document.execCommand('copy');
+        document.body.removeChild(el); alert("帳號已複製");
+    }
+
+    function finalSubmit() {
+        const lastFive = document.getElementById('lastFive').value.trim();
+        if (lastFive.length !== 5) return alert("請輸入正確的匯款後五碼");
+        
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "傳送中..."; btn.disabled = true;
+
+        fetch('https://script.google.com/macros/s/AKfycbwNnFkIYi0VleEDuC2e3iCBmRMDYj8KO1hjpZHJwZ16AE0fcgSW85GtaN0WL6UNnXkIOQ/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                zipcode: document.getElementById('zipcode').value,
+                address: document.getElementById('address').value,
+                ...cart,
+                total_price: document.getElementById('modal-amt').innerText,
+                last_five: lastFive
+            })
+        }).then(() => {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('success-modal').style.display = 'flex';
+            let s = 120;
+            setInterval(() => { s--; document.getElementById('countdown').innerText = s; if(s<=0) location.reload(); }, 1000);
+        });
+    }
+</script>
+</body>
+</html>
