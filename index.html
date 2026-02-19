@@ -56,7 +56,6 @@
             background-color: #fafffa;
         }
 
-        /* 挑選風味樣式 */
         .flavor-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px 0; border-bottom: 1px solid #F0F0F0;
@@ -107,7 +106,7 @@
         <div class="card">
             <div class="form-group">
                 <label>訂購姓名</label>
-                <input type="text" id="name" maxlength="15" placeholder="請填寫中文或英文姓名" oninput="checkValid(this, 1)">
+                <input type="text" id="name" maxlength="15" placeholder="請填寫姓名" oninput="checkValid(this, 1)">
             </div>
             <div class="form-group">
                 <label>訂購人電話 (10碼數字)</label>
@@ -190,7 +189,7 @@
 </div>
 
 <script>
-    // --- 1. 資料初始化 ---
+    // --- Data ---
     const flavors = [
         {id:'qty_original', name:'原味(無內餡)', price:50},
         {id:'qty_custard', name:'卡士達', price:70},
@@ -200,7 +199,7 @@
     ];
     let cart = { qty_original:0, qty_custard:0, qty_peanut:0, qty_matcha:0, qty_chocolate:0 };
 
-    // --- 2. 頁面 2 品項生成 ---
+    // --- Init Page 2 ---
     const listEl = document.getElementById('item-list');
     flavors.forEach(f => {
         listEl.innerHTML += `
@@ -214,7 +213,6 @@
             </div>`;
     });
 
-    // --- 3. 數量控制邏輯 (手動輸入 + 長度限制) ---
     function validateQtyInput(el, id) {
         el.value = el.value.replace(/[^0-9]/g, '');
         if (el.value.length > 3) el.value = el.value.slice(0, 3);
@@ -230,15 +228,16 @@
         cart[id] = newVal;
     }
 
-    // --- 4. 驗證與導覽 ---
+    // --- Validation ---
     function checkValid(el, min) {
         let isValid = false;
+        const val = el.value.trim();
         if (el.id === 'address') {
-            isValid = el.value.length >= 5 && /縣|市/.test(el.value) && /區|鄉|鎮|市/.test(el.value);
+            isValid = val.length >= 5 && (val.includes('縣') || val.includes('市')) && (val.includes('區') || val.includes('鄉') || val.includes('鎮') || val.includes('市'));
         } else if (el.id === 'zipcode') {
-            isValid = el.value.length >= 3;
+            isValid = val.length >= 3;
         } else {
-            isValid = el.value.trim().length >= min;
+            isValid = val.length >= min;
         }
         el.classList.toggle('valid-input', isValid);
     }
@@ -246,7 +245,7 @@
     function goPage(n) {
         if (n === 2 && !validateP1()) return;
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page'+n).classList.add('active');
+        document.getElementById('page' + n).classList.add('active');
         window.scrollTo(0,0);
     }
 
@@ -256,20 +255,22 @@
         const zip = document.getElementById('zipcode').value.trim();
         const addr = document.getElementById('address').value.trim();
 
-        if (name.length < 1) { alert("請填寫訂購姓名"); return false; }
+        if (name === "") { alert("請填寫訂購姓名"); return false; }
         if (phone.length !== 10) { alert("電話需完整 10 碼數字"); return false; }
-        if (zip.length < 3) { alert("郵遞區號請輸入 3 至 5 碼數字"); return false; }
+        if (zip.length < 3) { alert("郵遞區號請輸入至少 3 碼數字"); return false; }
         
-        const hasCity = /縣|市/.test(addr);
-        const hasDistrict = /區|鄉|鎮|市/.test(addr);
-        if (!hasCity || !hasDistrict || addr.length < 5) {
-            alert("地址格式不正確：請包含縣市與鄉鎮市區（例：新北市三重區...）");
+        // 修正後的地址檢查
+        const hasCity = addr.includes('縣') || addr.includes('市');
+        const hasDist = addr.includes('區') || addr.includes('鄉') || addr.includes('鎮') || addr.includes('市');
+        
+        if (!hasCity || !hasDist || addr.length < 5) {
+            alert("地址格式請包含縣市與區/鄉/鎮（例：新北市三重區...）");
             return false;
         }
         return true;
     }
 
-    // --- 5. 總計與運費邏輯 ---
+    // --- Summary ---
     function renderSummary() {
         let subtotal = 0, totalQty = 0, html = '';
         flavors.forEach(f => {
@@ -283,7 +284,6 @@
 
         if(subtotal === 0) return alert("請至少挑選一個品項喔！");
 
-        // 運費判斷：小計滿 3000 免運，否則 160
         const shippingFee = subtotal >= 3000 ? 0 : 160;
         const finalTotal = subtotal + shippingFee;
 
@@ -307,16 +307,20 @@
         goPage(3);
     }
 
-    // --- 6. 彈窗與送出 ---
+    // --- Modal & Submit ---
     function openModal() { document.getElementById('modal').style.display='flex'; }
     function closeModal() { document.getElementById('modal').style.display='none'; }
     
     function copyAccount() {
         const acc = "24414400800351";
-        navigator.clipboard.writeText(acc).then(() => {
-            document.getElementById('copy-tip').style.display='inline';
-            setTimeout(() => document.getElementById('copy-tip').style.display='none', 2000);
-        });
+        const el = document.createElement('textarea');
+        el.value = acc;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        document.getElementById('copy-tip').style.display='inline';
+        setTimeout(() => document.getElementById('copy-tip').style.display='none', 2000);
     }
 
     function finalSubmit() {
@@ -338,12 +342,12 @@
 
         fetch('https://script.google.com/macros/s/AKfycbwNnFkIYi0VleEDuC2e3iCBmRMDYj8KO1hjpZHJwZ16AE0fcgSW85GtaN0WL6UNnXkIOQ/exec', {
             method: 'POST',
-            mode: 'no-cors', // 配合 Google Apps Script 常用模式
+            mode: 'no-cors',
             body: JSON.stringify(orderData)
         }).then(() => {
             showSuccessAndTimer();
         }).catch(() => {
-            alert("網路連線異常，請稍後再試。");
+            alert("發送失敗，請稍後再試。");
             btn.innerText = "確認並送出訂單"; btn.disabled = false;
         });
     }
