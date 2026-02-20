@@ -14,7 +14,7 @@
         /* Logo 區域樣式 */
         .header-section { text-align: center; margin-bottom: 25px; }
         .logo-img { 
-            width: 180px; /* 您可以在這裡調整 Logo 寬度 */
+            width: 180px; 
             max-width: 80%;
             height: auto; 
             margin-bottom: 10px; 
@@ -28,13 +28,13 @@
         .active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; padding: 20px; border-radius: 20px; border: 2px solid var(--ghibli-brown); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; position: relative; }
         label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95rem; }
-        input { width: 100%; height: 50px; font-size: 1rem; padding: 0 15px; border: 1.5px solid #DDD; border-radius: 12px; box-sizing: border-box; }
+        
+        input { width: 100%; height: 50px; font-size: 1rem; padding: 0 15px; border: 2px solid #DDD; border-radius: 12px; box-sizing: border-box; transition: 0.3s; }
         input:focus { border-color: var(--ghibli-green); outline: none; }
         .valid-input { border-color: var(--ghibli-green) !important; background-color: #fafffa; }
         
-        /* 品項列表 */
         .flavor-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #F0F0F0; }
         .qty-control { display: flex; align-items: center; gap: 8px; }
         .qty-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--ghibli-green); background: white; color: var(--ghibli-green); font-size: 1.2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: bold; }
@@ -46,11 +46,9 @@
         .btn-secondary { background: #EEE; color: var(--ghibli-brown); flex: 0.4; }
         .btn:disabled { background: #ccc !important; cursor: not-allowed; }
         
-        /* 彈窗樣式 */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-body { background: var(--ghibli-cream); padding: 25px; border-radius: 25px; width: 100%; border: 3px solid var(--ghibli-brown); text-align: center; max-width: 400px; }
         .hint-text { font-size: 0.8rem; color: #666; margin-top: 4px; }
-        .error-hint { color: var(--error-red); font-weight: bold; }
         .free-shipping-tag { color: var(--ghibli-green); font-weight: bold; font-size: 0.85rem; }
     </style>
 </head>
@@ -59,18 +57,16 @@
 <div class="app-container">
     <div class="header-section">
         <img src="https://scontent.ftpe3-1.fna.fbcdn.net/v/t39.30808-6/305406763_542794297644069_6275812267100319693_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=laUY6m_0sPgQ7kNvwF6XHZx&_nc_oc=AdnlFb2RrncQz_4j1tDjN40OHbexaQijywymExKgZxG_JIZX98s0VIu_Rl1itDYzd7M2HN9UmrNbS8PbVZUwFpMY&_nc_zt=23&_nc_ht=scontent.ftpe3-1.fna&_nc_gid=Kc8zWIy_HXX6-VXER1aBBQ&oh=00_Aftqh1mr-oX0ax96zkL4mXZs6SzMw5-2DRg0iK7pUUXJ4A&oe=699D1CEC" 
-             alt="將村手作甜點" 
-             class="logo-img" 
-             onerror="this.style.display='none';">
+             alt="將村手作甜點" class="logo-img" onerror="this.style.display='none';">
         <h1>將村手作甜點 | 宅配訂購單</h1>
     </div>
 
     <div id="page1" class="page active">
         <div class="card">
             <div class="form-group"><label>訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="請填寫姓名" oninput="checkValid(this, 1)"></div>
-            <div class="form-group"><label>訂購人電話 (10碼數字)</label><input type="tel" id="phone" maxlength="10" placeholder="例：0912345678;家用電話需加上區碼為0228957766" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)"></div>
-            <div class="form-group"><label>宅配郵遞區號 (3碼或是5碼)</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：241" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 3)"></div>
-            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="例：臺北市北投區大同街317號1樓" oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
+            <div class="form-group"><label>訂購人電話 (10碼數字)</label><input type="tel" id="phone" maxlength="10" placeholder="例：0912345678" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)"></div>
+            <div class="form-group"><label>宅配郵遞區號</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：241" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 3)"></div>
+            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="臺北市北投區大同街317號1樓" oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
         </div>
         <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 →</button></div>
     </div>
@@ -117,9 +113,9 @@
         <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px;">
             1. 店家將於 24H 內完成對帳。<br>
             2. 對帳完成後將透過LINE@發送確認通知，如沒有收到通知請於上班時間來電。<br>
-            3. 排單製作後皆無法取消。
-            4. 出貨日為下單7-14天(不含假日)；出貨當天將以 LINE@ 通知。
-            5. 二人作業，請耐心等待，謝謝。
+            3. 排單製作後皆無法取消。<br>
+            4. 出貨日為下單7-14天(不含假日)；出貨當天將以 LINE@ 通知。<br>
+            5. 二人作業，請耐心等待，謝謝。<br>
         </div>
         <p>視窗將於 <span id="countdown">120</span> 秒後重置。</p>
         <button class="btn btn-primary" onclick="location.reload()">回首頁</button>
@@ -127,7 +123,6 @@
 </div>
 
 <script>
-    // 【重要：請在此貼上您的 GAS 部署網址】
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzIikJ6dZZwOOrShWrUUGgBEatzQQjPMGPFlAIcPwy8bhIhoYXDB_nS11cZpxgUYvFYng/exec'; 
 
     const flavors = [
@@ -197,7 +192,6 @@
         if (confirm(`您的訂單共 ${totalQty} 顆，將拆為 ${boxes} 箱配送。\n\n「確認」：查看訂購明細\n「取消」：返回修改數量`)) {
             let summaryContentHtml = itemsHtml + `<hr style="border: 0.5px dashed #ccc; margin: 10px 0;">`;
             summaryContentHtml += `<p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>`;
-            
             summaryContentHtml += `
                 <p style="display:flex; justify-content:space-between; margin:0;">
                     <span>運費(另計) ${isFree ? '<small class="free-shipping-tag">(已達免運)</small>' : ''}</span> 
@@ -219,12 +213,23 @@
     function copyAccount() { const acc = "24414400800351"; const el = document.createElement('textarea'); el.value = acc; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("帳號已複製"); }
 
     function finalSubmit() {
-        if (localStorage.getItem('order_lock')) return alert("訂單處理中...");
         const lastFive = document.getElementById('lastFive').value.trim();
         if (!/^\d{5}$/.test(lastFive)) return alert("請輸入 5 位數字後五碼");
 
         const btn = document.getElementById('submit-btn');
         btn.innerText = "傳送中..."; btn.disabled = true;
+
+        // --- 新增：5秒逾時判斷機制 ---
+        let isOrderSuccess = false; // 標記是否成功完成
+        const timeoutDuration = 5000; // 5000 毫秒 = 5 秒
+
+        const timeoutId = setTimeout(() => {
+            if (!isOrderSuccess) {
+                btn.innerText = "確認並送出訂單"; 
+                btn.disabled = false;
+                alert("⚠️ 傳送失敗：偵測為重複訂單或連線超時，請重新開啟新的視窗再進行下單。");
+            }
+        }, timeoutDuration);
 
         const now = new Date();
         const orderDate = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`;
@@ -250,9 +255,10 @@
             body: JSON.stringify(orderData)
         })
         .then(() => {
-            localStorage.setItem('order_lock', 'true');
-            setTimeout(() => localStorage.removeItem('order_lock'), 120000);
-            
+            // 到達這一步代表請求已送出（no-cors 模式下預設進入 then）
+            isOrderSuccess = true;
+            clearTimeout(timeoutId); // 清除 5 秒警報
+
             document.getElementById('modal').style.display = 'none';
             document.getElementById('success-modal').style.display = 'flex';
             
@@ -264,6 +270,8 @@
             }, 1000);
         })
         .catch(err => {
+            isOrderSuccess = true; // 既然出錯了也要停止計時器
+            clearTimeout(timeoutId);
             console.error("Error:", err);
             alert("發送失敗，請聯繫店家或檢查網路。");
             btn.innerText = "確認送出"; btn.disabled = false;
@@ -272,6 +280,3 @@
 </script>
 </body>
 </html>
-
-
-
