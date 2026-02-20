@@ -156,7 +156,7 @@
         <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 1rem; line-height: 1.6; margin-bottom: 15px;">
             1. 店家將於 24H 內完成對帳。<br>
             2. 對帳完成將透過 LINE@ 發送確認通知，如沒有收到通知請於上班日來電。<br>
-            3. 出貨日為下單7-14天(不含假日))；出貨當天將以 LINE@ 通知。<br>
+            3. 出貨日為下單7-14天(不含假日)；出貨當天將以 LINE@ 通知。<br>
             4. 二人作業，請耐心等待，謝謝。<br>
         </div>
         <p>視窗將於 <span id="countdown">120</span> 秒後重置。</p>
@@ -259,7 +259,7 @@
                     <span>運費(另計) ${isFree ? '<small class="free-shipping-tag">(已達免運)</small>' : ''}</span> 
                     <span style="color:${isFree ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight:bold;">${shippingFee}元</span>
                 </p>
-                <p style="font-size:0.85rem; color:#666; margin-top:5px; line-height:1.4;">配送箱數：<b>${boxes}</b> 箱。</p>`;
+                <p style="font-size:0.85rem; color:#666; margin-top:5px; line-height:1.4;">配送箱數：<b>${boxes}</b> 箱</p>`;
             document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${subtotal + shippingFee}</span>`;
             document.getElementById('modal-amt').innerText = subtotal + shippingFee;
             goPage(3);
@@ -320,3 +320,4 @@
 </script>
 </body>
 </html>
+
