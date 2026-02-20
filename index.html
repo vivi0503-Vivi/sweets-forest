@@ -62,7 +62,7 @@
              alt="將村手作甜點" 
              class="logo-img" 
              onerror="this.style.display='none';">
-        <h1>宅配訂購單</h1>
+        <h1>將村手作甜點 | 宅配訂購單</h1>
     </div>
 
     <div id="page1" class="page active">
@@ -70,7 +70,7 @@
             <div class="form-group"><label>訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="請填寫姓名" oninput="checkValid(this, 1)"></div>
             <div class="form-group"><label>訂購人電話 (10碼數字)</label><input type="tel" id="phone" maxlength="10" placeholder="例：0912345678;家用電話需加上區碼為0228957766" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 10)"></div>
             <div class="form-group"><label>宅配郵遞區號 (3碼或是5碼)</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：241" oninput="this.value=this.value.replace(/[^0-9]/g,''); checkValid(this, 3)"></div>
-            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="臺北市北投區大同街317號1樓" oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
+            <div class="form-group"><label>宅配詳細地址</label><input type="text" id="address" maxlength="40" placeholder="例：臺北市北投區大同街317號1樓" oninput="checkValid(this, 8)"><p class="hint-text">格式：縣市 + 區/鄉/鎮 + 路/街/大道名稱</p></div>
         </div>
         <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 →</button></div>
     </div>
@@ -115,9 +115,11 @@
     <div class="modal-body">
         <h2 style="color: var(--ghibli-green);">🎉 訂單已受理！</h2>
         <div style="background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px;">
-            1. 系統將於 24H 內自動對帳。<br>
-            2. 對帳完成將發送確認。<br>
-            3. 排單製作後宅配寄出。
+            1. 店家將於 24H 內完成對帳。<br>
+            2. 對帳完成後將透過LINE@發送確認通知，如沒有收到通知請於上班時間來電。<br>
+            3. 排單製作後皆無法取消。
+            4. 出貨日為下單7-14天(不含假日)；出貨當天將以 LINE@ 通知。
+            5. 二人作業，請耐心等待，謝謝。
         </div>
         <p>視窗將於 <span id="countdown">120</span> 秒後重置。</p>
         <button class="btn btn-primary" onclick="location.reload()">回首頁</button>
@@ -270,5 +272,6 @@
 </script>
 </body>
 </html>
+
 
 
