@@ -7,10 +7,10 @@
     <style>
         :root {
             /* 🇯🇵 日本傳統配色 (高對比版) */
-            --ink-blue: #191970;          /* 墨藍色 (Logo主色) */
-            --washi-white: #FFFFFF;       /* 純白 (輸入框底色) */
-            --cinnabar-red: #D32F2F;      /* 硃砂紅 (Logo圈圈與按鈕色) */
-            --paper-cream: #FDF5E6;       /* 生成色 (和風宣紙背景) */
+            --ink-blue: #191970;          /* 墨藍色 - 勝色 */
+            --washi-white: #FFFFFF;       /* 純白 - 輸入框底色 */
+            --cinnabar-red: #D32F2F;      /* 硃砂紅 - 強調色 */
+            --paper-cream: #FDF5E6;       /* 生成色 - 極淡粉背景 */
             --error-red: #D32F2F;
             --success-green: #008000;
         }
@@ -20,31 +20,28 @@
             background-color: var(--paper-cream); 
             color: var(--ink-blue); 
             margin: 0; padding: 0;
-            /* 構圖：高對比和風宣紙背景 */
-            background-image: 
-                radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(253, 245, 230, 0) 70%),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M0,0h100v100h-100v-100zm50,0c10,0 20,10 30,20c10,10 20,20 30,30c10,10 0,20 -10,30c-10,10 -20,20 -30,30c-10,10 -20,10 -30,0c-10,-10 -20,-20 -30,-30c-10,-10 -10,-20 -10,-30c0,-10 10,-20 20,-30zm10,10c5,0 10,5 15,10c5,5 10,10 15,15c5,5 0,10 -5,15c-5,5 -10,10 -15,15c-5,5 -10,5 -15,0c-5,-5 -10,-10 -15,-15c-5,-5 -5,-10 -5,-15c0,-5 5,-10 10,-15z" fill="rgba(211,47,47,0.02)"/></svg>');
+            background-image: radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(253, 245, 230, 0) 70%);
             background-attachment: fixed;
             background-size: cover;
         }
 
         .app-container { max-width: 500px; margin: 0 auto; min-height: 100vh; padding: 20px; box-sizing: border-box; padding-bottom: 120px; position: relative; }
         
-        /* 分頁絕對隱藏邏輯 */
+        /* ✅ 核心修正：徹底隔離分頁，防止資訊一起顯示 */
         .page { display: none !important; width: 100%; }
         .page.active { display: block !important; animation: washiFadeIn 0.5s ease-out; }
         @keyframes washiFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         .header-section { text-align: center; margin-bottom: 25px; }
-        .logo-img { width: 150px; height: 150px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 15px rgba(25, 25, 112, 0.4); object-fit: cover; margin: 0 auto 10px; display: block; }
-        h1 { color: var(--ink-blue); font-size: 1.4rem; margin: 0; font-weight: bold; text-shadow: 1px 1px 0px white; }
+        .logo-img { width: 140px; height: 140px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 15px rgba(25, 25, 112, 0.4); object-fit: cover; margin: 0 auto 10px; display: block; }
+        h1 { color: var(--ink-blue); font-size: 1.4rem; margin: 0; font-weight: bold; letter-spacing: 1.5px; text-shadow: 1px 1px 0px white; }
 
         .card { background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px; border: 2px solid white; box-shadow: 0 8px 25px rgba(25, 25, 112, 0.1); margin-bottom: 20px; }
 
         .form-group { margin-bottom: 18px; text-align: left; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95rem; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95rem; color: var(--ink-blue); }
         
-        /* ✅ 高對比輸入框：雪白底色+墨藍邊框 */
+        /* ✅ 修正：高對比輸入框，確保看清內容 */
         input { 
             width: 100%; height: 50px; font-size: 1.1rem; padding: 0 15px; 
             border: 2px solid var(--ink-blue); 
@@ -58,34 +55,38 @@
         .flavor-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed rgba(25, 25, 112, 0.2); }
         .qty-control { display: flex; align-items: center; gap: 8px; }
         .qty-btn { width: 34px; height: 34px; border-radius: 5px; border: none; background: var(--ink-blue); color: white; font-size: 1.4rem; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .qty-input { width: 65px; text-align: center; border: 2px solid var(--ink-blue); border-radius: 8px; height: 34px; font-size: 1.2rem; font-weight: bold; background: white; }
+        .qty-input { width: 65px; text-align: center; border: 2px solid var(--ink-blue); border-radius: 8px; height: 34px; font-size: 1.2rem; font-weight: bold; color: var(--ink-blue); background: white; }
+        .subtotal-tag { min-width: 60px; text-align: right; color: var(--cinnabar-red); font-weight: bold; font-size: 0.9rem; }
 
         .shipping-card { margin-top: 15px; padding: 15px; background: white; border-radius: 15px; border: 2px dashed var(--cinnabar-red); text-align: center; }
 
-        /* ✅ 修正：底部導航按鈕高度 38px */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.9); padding: 12px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); display: flex; gap: 10px; max-width: 500px; margin: 0 auto; z-index: 999; border-radius: 20px 20px 0 0; }
+        /* ✅ 修正重點：按鈕縮小至 38px 高度 */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); padding: 12px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); display: flex; gap: 10px; max-width: 500px; margin: 0 auto; z-index: 999; border-radius: 20px 20px 0 0; }
         .btn { flex: 1; height: 38px; border-radius: 19px; border: none; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: 0.2s; letter-spacing: 1px; }
         .btn-primary { background: var(--cinnabar-red); color: white; box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3); }
         .btn-secondary { background: #EEE; color: #333; flex: 0.4; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-body { background: white; padding: 25px; border-radius: 25px; width: 100%; border: 3px solid var(--ink-blue); text-align: center; max-width: 400px; }
+        .modal-body, .confirm-box { background: white; padding: 25px; border-radius: 25px; width: 100%; border: 3px solid var(--ink-blue); text-align: center; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .confirm-title { color: var(--cinnabar-red); font-size: 1.5rem; text-shadow: 1px 1px 0px white; }
+        
+        .line-btn { display: flex; align-items: center; justify-content: center; background: #06C755; color: white; padding: 10px; border-radius: 20px; text-decoration: none; font-weight: bold; margin: 10px 0; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header-section">
-        <img src="https://scontent.ftpe3-1.fna.fbcdn.net/v/t39.30808-6/305406763_542794297644069_6275812267100319693_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=Cp2gopIPxmUQ7kNvwGDpma0&_nc_oc=AdnEb6hEG-9-I7Nc7yqkL9jZ3tFAZIovgbPkCF6ZVZNqnGn6NTzmw8uzmw6r4JOKztFb06gNLQbRkq23nLCbx47u&_nc_zt=23&_nc_ht=scontent.ftpe3-1.fna&_nc_gid=BFbURacS3abdRS5jppEVyQ&oh=00_Afv4dKs6klPbhd7mGEcTW8gdjMjApSGI62pTnxJ34_kMeQ&oe=69A7A8EC" alt="將村手作甜點" class="logo-img">
+        <img src="https://scontent.ftpe3-1.fna.fbcdn.net/v/t39.30808-6/305406763_542794297644069_6275812267100319693_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=LAtmXGjSGpsQ7kNvwH18cBV&_nc_oc=AdlDCnQJ84S9pAuNh3150d0iWpOYuCNq8cmysTZkvNYPcT_vnpUZzJJ8J1_kWTpt6wkKXjvTDm95sNaSSokqTq5-&_nc_zt=23&_nc_ht=scontent.ftpe3-1.fna&_nc_gid=yiAV4PoZUl8a9xQP4Z0_Mw&_nc_ss=8&oh=00_AfxxLW1L8utW27G2qztUAsM8UhLL2nTDS8u1y3l7zZkCgg&oe=69B315EC" alt="將村手作甜點" class="logo-img">
         <h1>將村手作甜點 | 宅配訂購單</h1>
     </div>
 
     <div id="page1" class="page active">
         <div class="card">
-            <div class="form-group"><label>📜 訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="填寫您的大名" oninput="validateField(this)"><div class="error-msg" id="name-error">請填寫姓名且不可含數字</div></div>
-            <div class="form-group"><label>📞 聯絡電話</label><input type="tel" id="phone" maxlength="10" placeholder="例: 0228957766 或 09xxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="phone-error">請輸入正確 10 位數字</div></div>
-            <div class="form-group"><label>📮 宅配郵遞區號</label><input type="tel" id="zipcode" maxlength="5" placeholder="例: 112" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="zipcode-error">請輸入正確區號</div></div>
-            <div class="form-group"><label>🏠 宅配詳細地址</label><input type="text" id="address" maxlength="50" placeholder="例:臺北市北投區大同街317號1樓" oninput="validateField(this)"><div class="error-msg" id="address-error">需含縣市、區、路街、號及樓層</div></div>
+            <div class="form-group"><label>📜 訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="填寫您的大名" oninput="validateField(this)"><div class="error-msg" id="name-error">姓名不可含數字且需至少 2 字</div></div>
+            <div class="form-group"><label>📞 聯絡電話</label><input type="tel" id="phone" maxlength="10" placeholder="例：0228957766 或 09xxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="phone-error">請輸入正確 10 位數字</div></div>
+            <div class="form-group"><label>📮 宅配郵遞區號</label><input type="tel" id="zipcode" maxlength="5" placeholder="例：112" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="zipcode-error">請輸入正確區號</div></div>
+            <div class="form-group"><label>🏠 宅配詳細地址</label><input type="text" id="address" maxlength="50" placeholder="例：臺北市北投區大同街317號1樓" oninput="validateField(this)"><div class="error-msg" id="address-error">需含縣市、區、路街、號及樓層</div></div>
         </div>
         <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 🍩</button></div>
     </div>
@@ -94,8 +95,7 @@
         <div class="card">
             <div id="item-list"></div>
             <div class="shipping-card">
-                <p style="margin:0; font-weight:bold;">📦 裝箱規定：每箱上限 45 顆</p>
-                <p id="shipping-hint" style="margin:8px 0; color:var(--error-red); font-weight:bold;">✨ 全館滿 $3000 免運費！</p>
+                <p style="margin:0; font-weight:bold;"> 溫馨提醒：📦每箱上限 45 顆</p>
                 <p id="fee-rule-hint" style="margin: 5px 0; font-size: 0.9rem; color: #555;">💡 未滿 $3000 元，每箱運費 225 元</p>
                 <div style="border-top: 1px solid #FFD1DC; padding-top:10px; margin-top:10px;">
                     <div>已選購：<span id="live-qty" style="color:var(--cinnabar-red);">0</span> 顆</div>
@@ -112,7 +112,7 @@
     </div>
 </div>
 
-<div id="custom-confirm" class="modal"><div class="modal-body"><h3>📦 配送箱數確認</h3><div id="confirm-text" style="margin:20px 0; font-size:1.2rem;"></div><div style="display:flex; gap:10px;"><button class="btn btn-secondary" onclick="closeConfirm(false)">返回</button><button class="btn btn-primary" onclick="closeConfirm(true)">確認正確</button></div></div></div>
+<div id="custom-confirm" class="modal"><div class="modal-body"><h3 class="confirm-title">📦 配送箱數確認</h3><div id="confirm-text" style="font-size: 1.2rem; margin: 20px 0; line-height: 1.6; color: var(--ink-blue);"></div><div style="display:flex; gap:10px;"><button class="btn btn-secondary" onclick="closeConfirm(false)">返回修改</button><button class="btn btn-primary" onclick="closeConfirm(true)">確認正確</button></div></div></div>
 <div id="modal" class="modal"><div class="modal-body"><h3>💰 匯款資訊</h3><div style="background:#FFF9FA; padding:15px; border-radius:10px; border:1px dashed var(--ink-blue); text-align:left; font-size:0.9rem; margin-bottom:15px;"><strong>郵局(700)</strong><br>帳號：24414400800351<br>戶名：莊詠茗</div><p>應匯總計：<strong id="modal-amt" style="color:var(--error-red); font-size:1.5rem;">0</strong> 元</p><div class="form-group"><label> 匯款後五碼：</label><input type="tel" id="lastFive" maxlength="5" oninput="validateField(this)"><div class="error-msg" id="lastFive-error">請輸入 5 碼數字</div></div>
     <button id="submit-btn" class="btn btn-primary" style="width:100%" onclick="finalSubmit()">確認送出訂單 🥯</button><p onclick="closeModal()" style="color:gray; margin-top:10px; cursor:pointer;">返回修改</p></div></div>
 <div id="success-modal" class="modal">
@@ -132,8 +132,6 @@
         <button class="btn btn-primary" style="width: 100%;" onclick="location.reload()">回首頁</button>
     </div>
 </div>
-
-
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyEGadX25B0yvCMbEwAEq_j4KDZCTyQy6bDK8nedwWWMNiCU-A_78klvCC8d_A2RqJl/exec'; 
     const flavors = [
@@ -175,7 +173,7 @@
             hintEl.innerHTML = "🎉 達成免運門檻！"; hintEl.style.color = "var(--success-green)"; ruleEl.style.display = "none";
         } else {
             hintEl.innerHTML = totalAmt === 0 ? "✨ 全館滿 $3000 免運！" : `🔥 還差 $${3000 - totalAmt} 即可免運！`;
-            hintEl.style.color = totalAmt === 0 ? "var(--cinnabar-red)" : "#d48806"; ruleEl.style.display = "block";
+            hintEl.style.color = totalAmt === 0 ? "var(--ink-blue)" : "#d48806"; ruleEl.style.display = "block";
         }
     }
 
@@ -184,20 +182,25 @@
         if (el.id === 'name') isValid = val.length >= 2 && !/\d/.test(val);
         if (el.id === 'phone') isValid = /^[0-9]{10}$/.test(val);
         if (el.id === 'zipcode') isValid = /^\d{3,5}$/.test(val);
-        if (el.id === 'address') isValid = /縣|市/.test(val) && /路|街|大道|巷/.test(val) && /號/.test(val) && /樓|室|層|F|f|B|b/.test(val);
+        if (el.id === 'address') isValid = /縣|市/.test(val) && /區|鄉|鎮|市|里|村/.test(val) && /路|街|大道|巷/.test(val) && /號/.test(val) && /樓|室|層|F|f|B|b/.test(val);
         if (el.id === 'lastFive') isValid = /^\d{5}$/.test(val);
         el.classList.toggle('input-error', !isValid && val.length > 0);
         if(errEl) errEl.style.display = (!isValid && val.length > 0) ? 'block' : 'none';
         return isValid;
     }
 
-    function handleGoPage2() {
+   function handleGoPage2() {
         const fields = ['name', 'phone', 'zipcode', 'address']; let ok = true;
         fields.forEach(id => { if(!validateField(document.getElementById(id))) ok = false; });
         if(ok) goPage(2); else alert("⚠️ 紅框處填寫格式不全(地址需含路名、號及樓層)");
     }
 
-    function goPage(n) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page' + n).classList.add('active'); window.scrollTo(0,0); }
+
+    function goPage(n) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page' + n).classList.add('active');
+        window.scrollTo(0,0);
+    }
 
     function renderSummary() {
         let subtotal = 0, totalQty = 0, itemsHtml = '';
@@ -208,11 +211,10 @@
                 subtotal += it; totalQty += cart[f.id];
             }
         });
-        if(subtotal === 0) return alert("請至少挑選一個品項喔！");
+        if(subtotal === 0) return alert("請挑選品項");
         const boxes = Math.ceil(totalQty / 45);
-        const isFree = subtotal >= 3000;
-        const shippingFee = isFree ? 0 : (boxes * 225);
-        window.tempData = { itemsHtml, subtotal, isFree, shippingFee, boxes };
+        const shippingFee = subtotal >= 3000 ? 0 : (boxes * 225);
+        window.tempData = { itemsHtml, subtotal, isFree: subtotal>=3000, shippingFee, boxes };
         document.getElementById('confirm-text').innerHTML = `訂單總共 <b>${totalQty}</b> 顆，拆為 <b>${boxes}</b> 箱配送。`;
         document.getElementById('custom-confirm').style.display = 'flex';
     }
@@ -221,7 +223,10 @@
         document.getElementById('custom-confirm').style.display = 'none';
         if(confirmed) {
             const { itemsHtml, subtotal, isFree, shippingFee, boxes } = window.tempData;
-            document.getElementById('summary-content').innerHTML = itemsHtml + `<hr><p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span><span>$${subtotal}</span></p><p style="display:flex; justify-content:space-between;"><span>運費</span><span style="color:${isFree?'green':'red'}">${shippingFee}元</span></p><p style="font-size:0.8rem;text-align:right;">箱數：${boxes} 箱</p>`;
+            document.getElementById('summary-content').innerHTML = itemsHtml + `<hr>` +
+                `<p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span><span>$${subtotal}</span></p>` +
+                `<p style="display:flex; justify-content:space-between;"><span>運費</span><span style="color:${isFree?'green':'red'}">${shippingFee}元</span></p>` +
+                `<p style="font-size:0.8rem;text-align:right;">箱數：${boxes} 箱</p>`;
             document.getElementById('final-total').innerText = `應匯總計：NT$ ${subtotal + shippingFee}`;
             document.getElementById('modal-amt').innerText = subtotal + shippingFee;
             goPage(3);
@@ -232,11 +237,11 @@
     function validateQtyInput(el, id) { el.value = el.value.replace(/[^0-9]/g, ''); cart[id] = parseInt(el.value) || 0; calculateLiveTotal(); }
     function openModal() { document.getElementById('modal').style.display='flex'; }
     function closeModal() { document.getElementById('modal').style.display='none'; }
-    function copyAccount() { const acc = "24414400800351"; navigator.clipboard.writeText(acc).then(() => alert("帳號已複製")); }
+    function copyAccount() { navigator.clipboard.writeText("24414400800351").then(() => alert("帳號已複製")); }
     function finalSubmit() {
         const lastFive = document.getElementById('lastFive'); if(!validateField(lastFive)) return alert("末5碼錯誤");
         const btn = document.getElementById('submit-btn'); btn.innerText = "資料傳送中..."; btn.disabled = true;
-       const now = new Date();
+        const now = new Date();
         const orderData = {
             order_date: `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`,
             order_time: `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`,
