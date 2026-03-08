@@ -6,11 +6,11 @@
     <title>將村手作甜點 | 宅配訂購單</title>
     <style>
         :root {
-            /* 🇯🇵 日本傳統配色 (高對比版) 🇯🇵 */
+            /* 🇯🇵 日本傳統配色 (呼應 Logo) 🇯🇵 */
             --ink-blue: #191970;          /* 墨藍色 - 勝色 */
             --washi-white: #FFFFFF;       /* 雪白 - 顯示輸入框 */
             --cinnabar-red: #D32F2F;      /* 硃砂紅 - 強調色 */
-            --paper-cream: #FFF5F7;       /* 生成色 - 極淡粉背景 */
+            --paper-cream: #FDF5E6;       /* 生成色 - 極淡紙背景 */
             --error-red: #D32F2F;
             --success-green: #008000;
         }
@@ -22,7 +22,7 @@
             margin: 0; padding: 0;
             /* 構圖：高雅的日式毛筆暈染背景 (概念與甜甜圈外圈一致) */
             background-image: 
-                radial-gradient(circle at center, white 0%, rgba(255, 255, 255, 0) 70%),
+                radial-gradient(circle at center, rgba(255,255,255,0.95) 0%, rgba(253, 245, 230, 0) 70%),
                 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><path d="M0,0h100v100h-100v-100zm50,0c10,0 20,10 30,20c10,10 20,20 30,30c10,10 0,20 -10,30c-10,10 -20,20 -30,30c-10,10 -20,10 -30,0c-10,-10 -20,-20 -30,-30c-10,-10 -10,-20 -10,-30c0,-10 10,-20 20,-30zm10,10c5,0 10,5 15,10c5,5 10,10 15,15c5,5 0,10 -5,15c-5,5 -10,10 -15,15c-5,5 -10,5 -15,0c-5,-5 -10,-10 -15,-15c-5,-5 -5,-10 -5,-15c0,-5 5,-10 10,-15z" fill="rgba(211,47,47,0.02)"/></svg>'); /* 微透明的和風墨印裝飾 */
             background-attachment: fixed;
             background-size: cover;
@@ -38,6 +38,8 @@
         .header-section { text-align: center; margin-bottom: 25px; }
         .logo-img { width: 150px; height: 150px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 15px rgba(25, 25, 112, 0.4); object-fit: cover; margin: 0 auto 10px; display: block; }
         h1 { color: var(--ink-blue); font-size: 1.4rem; margin: 0; font-weight: bold; letter-spacing: 1.5px; text-shadow: 1px 1px 0px white; }
+
+        .social-link-ig { display: inline-flex; align-items: center; gap: 5px; margin-top: 12px; color: white; text-decoration: none; font-size: 0.9rem; font-weight: bold; background: linear-gradient(45deg, #FF69B4, #FFB6C1); padding: 8px 20px; border-radius: 25px; box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); }
 
         .card { 
             background: rgba(255, 255, 255, 0.95); 
@@ -69,22 +71,23 @@
         .flavor-info strong { color: var(--ink-blue); font-size: 1.1rem; }
         .flavor-info small { color: #666; }
 
-        /* +/- 按鈕圖示全面甜點化 */
+        /* +/- 按鈕樣式甜點化，和風硃砂紅感 */
         .qty-control { display: flex; align-items: center; gap: 8px; }
         .qty-btn { width: 34px; height: 34px; border-radius: 5px; border: none; background: var(--ink-blue); color: white; font-size: 1.4rem; cursor: pointer; display: flex; justify-content: center; align-items: center; font-weight: bold; }
         .qty-input { width: 65px; text-align: center; border: 2px solid var(--ink-blue); border-radius: 8px; height: 34px; font-size: 1.2rem; font-weight: bold; color: var(--ink-blue); background: white; }
         .subtotal-tag { min-width: 60px; text-align: right; color: var(--cinnabar-red); font-weight: bold; font-size: 0.9rem; }
 
-        /* 底部導航按鈕，硃砂紅印感 */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(25, 25, 112, 0.05); display: flex; gap: 10px; max-width: 500px; margin: 0 auto; z-index: 999; border-radius: 20px 20px 0 0; }
-        .btn { flex: 1; height: 55px; border-radius: 30px; border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; letter-spacing: 1.5px; }
-        .btn-primary { background: var(--cinnabar-red); color: white; box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3); }
-        .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(211, 47, 47, 0.3); }
-        .btn-secondary { background: #EEE; color: #333; flex: 0.4; }
-
         /* 日本波紋感的硃砂紅卡片 */
         .shipping-card { margin-top: 15px; padding: 15px; background: white; border-radius: 15px; border: 2px dashed var(--cinnabar-red); text-align: center; }
 
+        /* ✅ 修正重點：底部導航按鈕，高度縮小至 38px，硃砂紅印感 */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.9); padding: 12px 20px; box-shadow: 0 -5px 15px rgba(25, 25, 112, 0.05); display: flex; gap: 10px; max-width: 500px; margin: 0 auto; z-index: 999; border-radius: 20px 20px 0 0; }
+        .btn { flex: 1; height: 38px; border-radius: 19px; border: none; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: 0.2s; letter-spacing: 1px; }
+        .btn-primary { background: var(--cinnabar-red); color: white; box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3); }
+        .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(211, 47, 47, 0.3); }
+        .btn-secondary { background: #EEE; color: #333; flex: 0.4; }
+        
+        /* 彈窗樣式保持原樣，CSS 已美化 */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal-body, .confirm-box { background: white; padding: 25px; border-radius: 25px; width: 100%; border: 3px solid var(--ink-blue); text-align: center; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .confirm-title { color: var(--cinnabar-red); font-size: 1.5rem; text-shadow: 1px 1px 0px white; }
@@ -103,12 +106,12 @@
 
     <div id="page1" class="page active">
         <div class="card">
-            <div class="form-group"><label>📜 訂購人姓名</label><input type="text" id="name" maxlength="15" placeholder="填寫您的大名" oninput="validateField(this)"><div class="error-msg" id="name-error">姓名不可含數字且需至少 2 字</div></div>
-            <div class="form-group"><label>📞 聯絡電話</label><input type="tel" id="phone" maxlength="10" placeholder="例: 0912345678" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="phone-error">請輸入 10 位電話數字</div></div>
-            <div class="form-group"><label>📮 宅配郵遞區號</label><input type="tel" id="zipcode" maxlength="5" placeholder="例如: 241" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="zipcode-error">請輸入正確 3 或 5 碼區號</div></div>
-            <div class="form-group"><label>🏠 宅配詳細地址</label><input type="text" id="address" maxlength="50" placeholder="送到家裡的地址" oninput="validateField(this)"><div class="error-msg" id="address-error">需含縣市、區、路街、號及樓層</div></div>
+            <div class="form-group"><label>📜 訂購姓名</label><input type="text" id="name" maxlength="15" placeholder="填寫您的大名" oninput="validateField(this)"><div class="error-msg" id="name-error">姓名不可含數字且需至少 2 字</div></div>
+            <div class="form-group"><label>📞 聯絡電話</label><input type="tel" id="phone" maxlength="10" placeholder="例: 0228957766" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="phone-error">請輸入 10 位電話數字</div></div>
+            <div class="form-group"><label>📮 宅配郵遞區號</label><input type="tel" id="zipcode" maxlength="5" placeholder="例: 112" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="zipcode-error">請輸入正確 3 或 5 碼區號</div></div>
+            <div class="form-group"><label>🏠 宅配詳細地址</label><input type="text" id="address" maxlength="50" placeholder="例:臺北市北投區大同街317號1樓" oninput="validateField(this)"><div class="error-msg" id="address-error">需含縣市、區、路街、號及樓層</div></div>
         </div>
-        <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 🍩</button></div>
+        <div class="bottom-nav"><button class="btn btn-primary" onclick="handleGoPage2()">下一步：挑選風味 🍙</button></div>
     </div>
 
     <div id="page2" class="page">
@@ -116,31 +119,30 @@
             <div id="item-list"></div>
             
             <div class="shipping-card">
-                <p style="margin:0; font-weight:bold; color:var(--ink-blue);">📦 每箱上限 45 顆</p>
+                <p style="margin:0; font-weight:bold; color:var(--ink-blue);">📦 裝箱規定：每箱上限 45 顆</p>
                 <p id="shipping-hint" style="margin:8px 0; color:var(--error-red); font-size:1.1rem; font-weight:bold;">✨ 全館滿 $3000 即享免運優惠！</p>
                 
-                <p id="fee-rule-hint" style="margin: 5px 0; font-size: 0.9rem; color: #555;">
-                    💡 未滿 $3000 元，每箱運費 225 元
-                </p>
+                <p id="fee-rule-hint" style="margin: 5px 0; font-size: 0.9rem; color: #555;">💡 未滿 $3000 元，每箱運費 225 元</p>
 
                 <div style="border-top: 1.5px solid #FFD1DC; padding-top:10px; margin-top:10px;">
-                    <div style="font-weight:bold; color:var(--ink-blue);">目前選購顆數：<span id="live-qty" style="color:var(--cinnabar-red);">0</span> 顆</div>
-                    <div style="font-size:1.2rem; font-weight:bold; color:var(--cinnabar-red);">目前選購總額：NT$ <span id="live-total">0</span></div>
+                    <div style="font-weight:bold; color:var(--ink-blue);">選購顆數：<span id="live-qty" style="color:var(--cinnabar-red);">0</span> 顆</div>
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--cinnabar-red);">選購總額：NT$ <span id="live-total">0</span></div>
                 </div>
             </div>
         </div>
-        <div class="bottom-nav"><button class="btn btn-secondary" onclick="goPage(1)">返回</button><button class="btn btn-primary" onclick="renderSummary()">查看明細 📋</button></div>
+        <div class="bottom-nav"><button class="btn btn-secondary" onclick="goPage(1)">返回</button><button class="btn btn-primary" onclick="renderSummary()">查看明細 🎌</button></div>
     </div>
 
     <div id="page3" class="page">
-        <div class="card"><h3>📋 訂購明細匯總</h3><div id="summary-content" style="line-height: 1.8;"></div><hr style="border:1px dashed var(--ink-blue); margin: 15px 0;"><h3 id="final-total" style="text-align: right; margin: 0; color: var(--cinnabar-red);"></h3></div>
+        <div class="card"><h3>📖 訂購明細匯總</h3><div id="summary-content" style="line-height: 1.8;"></div><hr style="border:1px dashed var(--ink-blue); margin: 15px 0;"><h3 id="final-total" style="text-align: right; margin: 0; color: var(--cinnabar-red);"></h3></div>
         <div class="bottom-nav"><button class="btn btn-secondary" onclick="goPage(2)">修改</button><button class="btn btn-primary" onclick="openModal()">確認匯款資訊 💰</button></div>
     </div>
 </div>
 
 <div id="custom-confirm" class="modal"><div class="modal-body"><h3 class="confirm-title">📦 配送箱數確認</h3><div id="confirm-text" style="font-size: 1.2rem; margin: 20px 0; line-height: 1.6; color: var(--ink-blue);"></div><div style="display:flex; gap:10px;"><button class="btn btn-secondary" onclick="closeConfirm(false)">返回修改</button><button class="btn btn-primary" onclick="closeConfirm(true)">確認正確</button></div></div></div>
 
-<div id="modal" class="modal"><div class="modal-body"><h3>💰 匯款帳戶資訊</h3><div style="background:white; padding:15px; border-radius:10px; border:1px dashed var(--ink-blue); text-align:left; font-size:0.95rem; margin-bottom:15px; color: var(--ink-blue);"><strong>郵局 (700)</strong><br>帳號：24414400800351<br>戶名：莊詠茗<br><button onclick="copyAccount()" style="margin-top:5px; width:100%; border:1px solid var(--ink-blue); border-radius:8px; padding:5px;">📋 複製帳號</button></div><p>應匯總計：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.4rem;">0</strong> 元</p><div class="form-group" style="text-align: left;"><label>💞 匯款後五碼：</label><input type="tel" id="lastFive" maxlength="5" placeholder="核對款項用" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="lastFive-error">請輸入正確 5 位數字</div></div><button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認送出訂單 🥯</button><p onclick="closeModal()" style="color:gray; margin-top:15px; cursor:pointer;">返回修改</p></div></div>
+<div id="modal" class="modal"><div class="modal-body"><h3>💰 匯款帳戶資訊</h3><div style="background:white; padding:15px; border-radius:10px; border:1px dashed var(--ink-blue); text-align:left; font-size:0.95rem; margin-bottom:15px; color: var(--ink-blue);"><strong>郵局 (700)</strong><br>帳號：24414400800351<br>戶名：莊詠茗<br><button onclick="copyAccount()" style="margin-top:5px; width:100%; border:1px solid var(--ink-blue); border-radius:8px; padding:5px;">📋 複製帳號</button></div><p>應匯總計：<strong id="modal-amt" style="color:var(--error-red); font-size: 1.5rem;">0</strong> 元</p><div class="form-group" style="text-align: left;"><label>💞 匯款後五碼：</label><input type="tel" id="lastFive" maxlength="5" placeholder="核對款項用" oninput="this.value=this.value.replace(/[^0-9]/g,''); validateField(this)"><div class="error-msg" id="lastFive-error">請輸入正確 5 位數字</div></div>
+        <button id="submit-btn" class="btn btn-primary" style="width: 100%;" onclick="finalSubmit()">確認送出訂單 🍩</button><p onclick="closeModal()" style="color:gray; margin-top:15px; cursor:pointer;">返回修改</p></div></div>
 
 <div id="success-modal" class="modal">
     <div class="modal-body">
@@ -207,16 +209,16 @@
         const ruleEl = document.getElementById('fee-rule-hint');
         
         if (totalAmt === 0) {
-            hintEl.innerHTML = "✨ 全館滿 $3000 即享免運優惠！";
+            hintEl.innerHTML = "✨ 全館滿 $3000 免運費！";
             hintEl.style.color = "var(--cinnabar-red)";
             ruleEl.style.display = "block";
         } else if (totalAmt < 3000) {
-            hintEl.innerHTML = `🔥 還差 <span style="font-size:1.3rem;">$${3000 - totalAmt}</span> 即可享免運！`;
-            hintEl.style.color = "#d48806"; // 橘黃警告色
+            hintEl.innerHTML = `🔥 還差 $${3000 - totalAmt} 即可享免運！`;
+            hintEl.style.color = "#d48806"; // 警告色橘黃
             ruleEl.style.display = "block";
         } else {
-            hintEl.innerHTML = "🎉 達成免運門檻！運費店家負擔";
-            hintEl.style.color = "var(--success-green)";
+            hintEl.innerHTML = "🎉 已達成免運門檻！";
+            hintEl.style.color = "green";
             ruleEl.style.display = "none";
         }
     }
@@ -229,7 +231,7 @@
         window.scrollTo(0,0);
     }
 
-    // 明細匯總 (ID 補齊，確保正常下一步)
+    // 明細匯總 (ID 補齊，確保能正常按到這步)
     function renderSummary() {
         let subtotal = 0, totalQty = 0, itemsHtml = '';
         flavors.forEach(f => {
@@ -260,7 +262,7 @@
             const { itemsHtml, subtotal, isFree, shippingFee, boxes } = window.tempData;
             document.getElementById('summary-content').innerHTML = itemsHtml + `<hr style="border:1px dashed #ccc; margin:10px 0;">
                 <p style="display:flex; justify-content:space-between; font-weight:bold;"><span>小計</span> <span>$${subtotal}</span></p>
-                <p style="display:flex; justify-content:space-between; margin:0;"><span>運費 ${isFree ? '<small style="color:green">(已達免運)</small>' : ''}</span> <span>${shippingFee}元</span></p>
+                <p style="display:flex; justify-content:space-between; margin:0;"><span>運費 ${isFree ? '<small class="free-shipping-tag">(已達免運)</small>' : ''}</span> <span>${shippingFee}元</span></p>
                 <p style="font-size:0.85rem; color:#666; margin-top:5px; text-align:right;">箱數：<b>${boxes}</b> 箱</p>`;
             document.getElementById('final-total').innerHTML = `應匯總計：NT$ ${subtotal + shippingFee}`;
             document.getElementById('modal-amt').innerText = subtotal + shippingFee;
@@ -274,18 +276,18 @@
         if (el.id === 'name') isValid = val.length >= 2 && /^[a-zA-Z\u4e00-\u9fa5 ]+$/.test(val);
         if (el.id === 'phone') isValid = /^[0-9]{10}$/.test(val);
         if (el.id === 'zipcode') isValid = /^\d{3,5}$/.test(val);
-        if (el.id === 'address') { isValid = /縣|市/.test(val) && /區|鄉|鎮|市|里|村/.test(val) && /路|街|大道|巷/.test(val) && /號/.test(val) && /樓|室|層|B|F|f|b/.test(val); }
+        if (el.id === 'address') isValid = /縣|市/.test(val) && /區|鄉|鎮|市|里|村/.test(val) && /路|街|大道|巷/.test(val) && /號/.test(val) && /樓|室|層|F|f|B|b/.test(val);
         if (el.id === 'lastFive') isValid = /^\d{5}$/.test(val);
         el.classList.toggle('input-error', !isValid && val.length > 0);
         if(errorEl) errorEl.style.display = (!isValid && val.length > 0) ? 'block' : 'none';
         return isValid;
     }
-    function handleGoPage2() { const fields = ['name', 'phone', 'zipcode', 'address']; let ok = true; fields.forEach(id => { if(!validateField(document.getElementById(id))) ok = false; }); if(ok) goPage(2); else alert("⚠️ 請修正紅框標示處資料 (地址格式需含路名、號、樓層)。"); }
+    function handleGoPage2() { const fields = ['name', 'phone', 'zipcode', 'address']; let ok = true; fields.forEach(id => { if(!validateField(document.getElementById(id))) ok = false; }); if(ok) goPage(2); else alert("⚠️ 紅框資料格式不全(地址需含路名、號、樓層)。"); }
     function openModal() { document.getElementById('modal').style.display='flex'; }
-    function closeModal() { document.getElementById('modal').style.display='none'; }
+    function closeModal() { document.getElementById('modal-amt').innerText = window.tempData.subtotal + window.tempData.shippingFee; document.getElementById('modal').style.display='none'; }
     function copyAccount() { const acc = "24414400800351"; navigator.clipboard.writeText(acc).then(() => alert("帳號已複製")); }
     function finalSubmit() {
-        const lastFive = document.getElementById('lastFive'); if(!validateField(lastFive)) return alert("請輸入正確 5 碼末 5 碼");
+        const lastFive = document.getElementById('lastFive'); if(!validateField(lastFive)) return alert("請填寫末 5 碼");
         const btn = document.getElementById('submit-btn'); btn.innerText = "資料傳送中..."; btn.disabled = true;
         const now = new Date();
         const orderData = {
