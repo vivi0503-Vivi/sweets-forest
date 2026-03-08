@@ -260,6 +260,7 @@
                     <span style="color:${isFree ? 'var(--ghibli-green)' : 'var(--error-red)'}; font-weight:bold;">${shippingFee}元</span>
                 </p>
                 <p style="font-size:0.85rem; color:#666; margin-top:5px; line-height:1.4;">配送箱數：<b>${boxes}</b> 箱</p>`;
+            <p style="font-size:0.85rem; color:#666; margin-top:5px; line-height:1.4;">未滿3000元，每箱運費225元</p>`;
             document.getElementById('final-total').innerHTML = `應匯總計：<span style="color:var(--error-red);">NT$ ${subtotal + shippingFee}</span>`;
             document.getElementById('modal-amt').innerText = subtotal + shippingFee;
             goPage(3);
@@ -320,6 +321,7 @@
 </script>
 </body>
 </html>
+
 
 
 
